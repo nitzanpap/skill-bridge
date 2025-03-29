@@ -127,11 +127,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b">
-        <div className="container flex h-16 items-center justify-between px-4">
+    <div className="min-h-screen bg-background">
+      <header className="border-b sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between px-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Skill Bridge</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Skill Bridge</h1>
             <p className="text-sm text-muted-foreground">
               Entity Extraction Tool
             </p>
@@ -140,30 +140,31 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container px-4 py-6 md:py-10">
-        <div className="grid gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Text Analysis</CardTitle>
+      <main className="container px-4 py-8 md:py-12 max-w-7xl mx-auto">
+        <div className="grid gap-8">
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xl">Text Analysis</CardTitle>
               <CardDescription>
                 Enter a job description or resume to extract skills and other
                 entities
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-6">
               <div className="grid gap-6">
                 <TextInput
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                 />
 
-                <div className="grid gap-2">
+                <div className="grid gap-3">
                   <h3 className="text-sm font-medium">Sample Texts</h3>
                   <div className="flex flex-wrap gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleSampleSelection("software-engineer")}
+                      className="transition-colors"
                     >
                       Software Engineer
                     </Button>
@@ -171,6 +172,7 @@ export default function Home() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleSampleSelection("data-scientist")}
+                      className="transition-colors"
                     >
                       Data Scientist
                     </Button>
@@ -178,6 +180,7 @@ export default function Home() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleSampleSelection("product-manager")}
+                      className="transition-colors"
                     >
                       Product Manager
                     </Button>
@@ -190,7 +193,7 @@ export default function Home() {
                 />
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="border-t bg-muted/50 p-4">
               <Button
                 onClick={analyzeText}
                 disabled={!inputText.trim() || isAnalyzing}

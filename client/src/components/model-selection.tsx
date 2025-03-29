@@ -20,7 +20,7 @@ export function ModelSelection({
   ];
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-3">
       <h3 className="text-sm font-medium">Select Models</h3>
       <div className="flex flex-wrap gap-2">
         {models.map((model) => (
@@ -29,6 +29,7 @@ export function ModelSelection({
             variant={selectedModels.includes(model.id) ? "default" : "outline"}
             size="sm"
             onClick={() => onModelSelect(model.id)}
+            className="transition-colors"
           >
             {model.name}
           </Button>

@@ -1,12 +1,10 @@
-import Layout from "@/pages/layout";
-import Home from "@/pages/page";
+import Home from "./pages/page";
+import RootLayout from "./pages/layout";
 
-function App() {
+export default function App() {
   return (
-    <Layout>
+    <RootLayout>
       <Home />
-    </Layout>
+    </RootLayout>
   );
 }
-
-export default App;
