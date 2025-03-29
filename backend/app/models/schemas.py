@@ -29,6 +29,21 @@ class AnalysisResponse(BaseModel):
     )
 
 
+class CombinedAnalysisRequest(BaseModel):
+    """Request schema for combined text analysis across all models."""
+
+    text: str = Field(..., description="The text to analyze")
+
+
+class CombinedAnalysisResponse(BaseModel):
+    """Response schema for combined text analysis results from all models."""
+
+    entities: List[Entity] = Field(
+        default_factory=list,
+        description="List of distinct extracted entities from all models",
+    )
+
+
 class ModelsResponse(BaseModel):
     """Response schema for available models."""
 

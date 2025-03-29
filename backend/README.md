@@ -148,6 +148,31 @@ Response:
 }
 ```
 
+#### Analyze Text with All Models
+
+```
+POST /api/v1/analyze/all
+```
+
+Request:
+```json
+{
+  "text": "Senior ML Engineer with 5 years at Amazon"
+}
+```
+
+Response:
+```json
+{
+  "entities": [
+    {"text": "Senior ML Engineer", "label": "ROLE"},
+    {"text": "5 years", "label": "EXPERIENCE"},
+    {"text": "Amazon", "label": "ORG"},
+    {"text": "ML Engineer", "label": "SKILL"}
+  ]
+}
+```
+
 #### List Available Models
 
 ```
