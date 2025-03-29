@@ -10,6 +10,7 @@ from ..models.schemas import (
 )
 from ..services.nlp_service import NLPService
 from ..services.rag_service import RAGService
+from ..services.similarity_service import SimilarityService
 
 # Create router instance
 router = APIRouter()
@@ -49,6 +50,40 @@ async def recommend_courses(request: CourseRecommendationRequest):
             request.resume_text,
             ground_truth_skills=all_job_skills,
         )
+
+        # Implement scoring for each course
+        user_skills_set = set(recommendations["user_skills"])
+        job_skills_set = set(recommendations["job_skills"])
+
+        # Get the original score
+        original_score = skill_comparison["score"]
+
+        # Add score to each recommended course
+        for course in recommendations["recommended_courses"]:
+            # Extract course skills using NLP service
+            course_description = course.get("description", "")
+            course_entities = NLPService.extract_distinct_entities_from_all_models(
+                course_description
+            )
+            course_skills = {
+                e.text
+                for e in course_entities
+                if e.label.upper() in ("SKILL", "PRODUCT", "ORG", "GPE", "LANGUAGE")
+            }
+
+            # Create enhanced skill set by combining user skills with course skills
+            enhanced_skills = user_skills_set.union(course_skills)
+
+            # Calculate new match score with enhanced skills
+            enhanced_score_result = SimilarityService.semantic_matching_score(
+                job_skills_set, enhanced_skills, threshold=request.threshold
+            )
+
+            # Add score to the course object
+            course["potential_score"] = enhanced_score_result["score"]
+            course["score_improvement"] = max(
+                0, enhanced_score_result["score"] - original_score
+            )
 
         # Convert the recommendations to the response model
         return CourseRecommendationResponse(

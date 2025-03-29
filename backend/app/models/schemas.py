@@ -36,6 +36,12 @@ class CourseRecommendation(BaseModel):
     course_name: str = Field(..., description="The name of the recommended course")
     url: str = Field(..., description="URL to access the course")
     description: str = Field("", description="Brief description of the course")
+    potential_score: float = Field(
+        0.0, description="Potential job match score if this course is completed"
+    )
+    score_improvement: float = Field(
+        0.0, description="Score improvement over current skills"
+    )
 
 
 class CourseRecommendationRequest(BaseModel):
