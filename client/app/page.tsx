@@ -12,10 +12,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./components/theme-toggle"
 import { TextInput } from "./components/text-input"
-import { ModelSelection } from "./components/model-selection"
 import { ResultsDisplay } from "./components/results-display"
 import { Loader2 } from "lucide-react"
-import { analyzeText, analyzeTextAllModels, Entity } from "@/lib/api"
+import { analyzeTextAllModels } from "@/lib/api"
 import { transformEntitiesForUI, entityTypeColors } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
 
@@ -30,28 +29,9 @@ const sampleTexts = {
 
 export default function Home() {
   const [inputText, setInputText] = useState("")
-  const [selectedModels, setSelectedModels] = useState<string[]>(["all"])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [processingStatus, setProcessingStatus] = useState<string>("")
   const [entities, setEntities] = useState<Record<string, string[]> | null>(null)
-
-  const handleModelSelection = (model: string) => {
-    if (model === "all") {
-      setSelectedModels(["all"])
-    } else {
-      const newSelection = selectedModels.filter((m) => m !== "all")
-      if (newSelection.includes(model)) {
-        setSelectedModels(newSelection.filter((m) => m !== model))
-      } else {
-        setSelectedModels([...newSelection, model])
-      }
-
-      // If no models are selected, default to "all"
-      if (newSelection.length === 0) {
-        setSelectedModels(["all"])
-      }
-    }
-  }
 
   const handleSampleSelection = (sampleKey: string) => {
     setInputText(sampleTexts[sampleKey as keyof typeof sampleTexts])
@@ -66,16 +46,9 @@ export default function Home() {
 
     try {
       const apiStartTime = performance.now()
-      let apiEntities: Entity[] = []
 
-      // Check if "all" is selected or if specific models are selected
-      if (selectedModels.includes("all")) {
-        apiEntities = await analyzeTextAllModels(inputText)
-      } else {
-        // If multiple models are selected, get results from first selected model
-        // (backend doesn't support multiple specific models in one call)
-        apiEntities = await analyzeText(inputText, selectedModels[0])
-      }
+      // Always use all models
+      const apiEntities = await analyzeTextAllModels(inputText)
 
       const apiEndTime = performance.now()
       setProcessingStatus(
@@ -97,7 +70,7 @@ export default function Home() {
         return
       }
 
-      // Process the entities - much faster now without text highlighting
+      // Process the entities
       const transformStartTime = performance.now()
       const groupedEntities = transformEntitiesForUI(apiEntities)
       const transformEndTime = performance.now()
@@ -125,7 +98,7 @@ export default function Home() {
       }
       setIsAnalyzing(false)
     }
-  }, [inputText, selectedModels])
+  }, [inputText])
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,11 +151,6 @@ export default function Home() {
                     </Button>
                   </div>
                 </div>
-
-                <ModelSelection
-                  selectedModels={selectedModels}
-                  onModelSelect={handleModelSelection}
-                />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
