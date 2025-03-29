@@ -23,10 +23,13 @@ const nextConfig = {
   },
   // Add async rewrites to proxy API requests in development
   async rewrites() {
+    // Default to localhost:8000 if NEXT_PUBLIC_API_URL is not defined
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
     return [
       {
         source: "/api/:path*",
-        destination: process.env.NEXT_PUBLIC_API_URL + "/api/:path*",
+        destination: `${apiUrl}/api/:path*`,
       },
     ]
   },

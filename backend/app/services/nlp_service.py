@@ -6,6 +6,7 @@ from typing import List, Optional
 
 from ..models.schemas import Entity
 from ..utils.loader import ModelLoader
+from .similarity_service import SimilarityService
 
 
 class NLPService:
@@ -80,16 +81,19 @@ class NLPService:
         return ModelLoader.list_available_models()
 
     @staticmethod
-    def compare_skills(resume_text: str, job_description_text: str) -> dict:
+    def compare_skills_semantic(
+        resume_text: str, job_description_text: str, threshold: float = 0.5
+    ) -> dict:
         """
-        Compare skills between resume and job description.
+        Compare skills between resume and job description using semantic similarity.
 
         Args:
             resume_text: The resume text to analyze
             job_description_text: The job description text to analyze
+            threshold: Similarity threshold for considering skills as a match
 
         Returns:
-            Dictionary containing resume skills, job skills, and missing skills
+            Dictionary containing score, matched skills, missing skills, and matching details
         """
         # Extract skills from both texts using all models
         resume_entities = NLPService.extract_distinct_entities_from_all_models(
@@ -99,29 +103,25 @@ class NLPService:
             job_description_text
         )
 
-        # Filter for skills only (typically these would have label 'SKILL')
-        # Note: You may need to adjust this based on how your models label skills
+        # Filter for skills only
         resume_skills = [
-            e
+            e.text
             for e in resume_entities
             if e.label.upper() in ("SKILL", "PRODUCT", "ORG", "GPE", "LANGUAGE")
         ]
         job_skills = [
-            e
+            e.text
             for e in job_entities
             if e.label.upper() in ("SKILL", "PRODUCT", "ORG", "GPE", "LANGUAGE")
         ]
 
-        # Find missing skills (in job but not in resume)
-        resume_skill_texts = {skill.text.lower() for skill in resume_skills}
-        missing_skills = [
-            skill
-            for skill in job_skills
-            if skill.text.lower() not in resume_skill_texts
-        ]
+        # Convert to sets to remove duplicates
+        resume_skills_set = set(resume_skills)
+        job_skills_set = set(job_skills)
 
-        return {
-            "resume_skills": resume_skills,
-            "job_skills": job_skills,
-            "missing_skills": missing_skills,
-        }
+        # Use similarity service to compute match score
+        result = SimilarityService.semantic_matching_score(
+            job_skills_set, resume_skills_set, threshold=threshold
+        )
+
+        return result
