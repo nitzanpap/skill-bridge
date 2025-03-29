@@ -27,6 +27,8 @@ Then access API at http://localhost:8000/docs
 ## Features
 
 - Serves custom-trained spaCy NER models via REST API
+- Semantic matching of skills using sentence-transformers
+- Match scoring between resume and job requirements
 - Built with FastAPI for speed and modern tooling
 - Clean architecture principles for maintainability
 - Docker support for easy deployment
@@ -36,6 +38,8 @@ Then access API at http://localhost:8000/docs
 
 - Python 3.10+
 - Docker (optional, for containerized deployment)
+- sentence-transformers (for semantic matching functionality)
+- scikit-learn (for similarity metrics)
 
 ## Setup
 
@@ -123,6 +127,52 @@ python -m app.main
 
 ### API Endpoints
 
+#### Semantic Skill Comparison
+
+```
+POST /api/v1/compare-skills/semantic
+```
+
+Request:
+```json
+{
+  "resume_text": "Machine learning engineer with 5 years of Python experience",
+  "job_description_text": "Looking for an ML expert with deep experience in Python programming",
+  "threshold": 0.5
+}
+```
+
+Response:
+```json
+{
+  "score": 85.5,
+  "matched_skills": ["Machine learning", "Python"],
+  "missing_skills": ["deep learning"],
+  "matching_details": [
+    {
+      "job_skill": "ML",
+      "best_match": "Machine learning",
+      "similarity": 0.89,
+      "is_match": true
+    },
+    {
+      "job_skill": "Python programming",
+      "best_match": "Python",
+      "similarity": 0.92,
+      "is_match": true
+    },
+    {
+      "job_skill": "deep learning",
+      "best_match": "Machine learning",
+      "similarity": 0.45,
+      "is_match": false
+    }
+  ]
+}
+```
+
+This endpoint extracts skills from both the resume and job description using NER, then compares them semantically using sentence transformers to identify matches even when terms aren't exactly the same (e.g., "ML" and "Machine Learning").
+
 #### Analyze Text
 
 ```
@@ -206,7 +256,8 @@ backend/
 │   ├── api/
 │   │   └── routes.py        # HTTP endpoints
 │   ├── services/
-│   │   └── nlp_service.py   # Business logic (spaCy inference)
+│   │   ├── nlp_service.py   # Business logic (spaCy inference)
+│   │   └── similarity_service.py   # Semantic similarity computation
 │   ├── models/
 │   │   └── schemas.py       # Pydantic request/response schemas
 │   ├── core/
