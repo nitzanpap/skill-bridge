@@ -2,6 +2,25 @@
 
 A production-grade, containerized Python backend server that serves custom-trained spaCy NER models via REST API endpoints. The backend is built with FastAPI and provides a clean architecture for maintainability and future extensions.
 
+## Tech Stack
+
+- **Framework**: FastAPI 0.100.0+ (async Python web framework)
+- **ML & Data Science**:
+  - spaCy 3.6+ for NER models and language processing
+  - sentence-transformers 2.2.2+ for semantic embeddings
+  - scikit-learn 1.3+ for similarity metrics and data processing
+  - NumPy and Pandas for data manipulation
+- **API**: RESTful architecture with JSON schemas
+- **Documentation**: Auto-generated OpenAPI/Swagger
+- **Language**: Python 3.10+
+- **Containerization**: Docker with multi-stage builds
+- **Dependency Management**: pip with requirements.txt
+- **Testing**: pytest for unit and integration tests
+- **Development Tools**:
+  - Black for code formatting
+  - Flake8 for linting
+  - mypy for type checking
+
 ## Quick Start
 
 Unix/Linux/Mac:
@@ -40,17 +59,37 @@ Then access API at http://localhost:8000/docs
 
 - Python 3.10+
 - Docker (optional, for containerized deployment)
-- sentence-transformers (for semantic matching functionality)
-- scikit-learn (for similarity metrics)
+- 4GB+ RAM for running NLP models
+- 2GB+ disk space for models and dependencies
+
+### Python Dependencies
+
+The main dependencies include:
+- FastAPI: Web framework
+- Uvicorn: ASGI server
+- spaCy: NLP framework
+- sentence-transformers: Embeddings for semantic search
+- scikit-learn: Machine learning utilities
+- Pydantic: Data validation
+- python-dotenv: Environment variable management
 
 ## Setup
+
+### Prerequisites
+
+Before installation, verify your Python version:
+
+```bash
+python --version  # Should be 3.10 or higher
+```
 
 ### Local Development (Without Docker)
 
 1. Clone the repository and navigate to the backend directory:
 
 ```bash
-cd backend
+git clone https://github.com/yourusername/skill-bridge.git
+cd skill-bridge/backend
 ```
 
 2. Run the setup script which creates a virtual environment and installs dependencies:
@@ -83,6 +122,14 @@ pip install -r requirements.txt
 
 3. Make sure your spaCy models are in the `models/` directory.
 
+4. Configure environment variables by creating a `.env` file:
+
+```
+MODELS_DIR=./models
+DEFAULT_MODEL=ner_model_20000
+ALLOWED_ORIGINS=*
+```
+
 ### Docker Setup
 
 1. Build the Docker image:
@@ -95,6 +142,12 @@ docker build -t skillbridge-backend .
 
 ```bash
 docker run -p 8000:8000 skillbridge-backend
+```
+
+For development with mounted volumes (to reflect code changes):
+
+```bash
+docker run -p 8000:8000 -v $(pwd):/app skillbridge-backend
 ```
 
 ## Usage
@@ -126,6 +179,12 @@ Windows:
 .venv\Scripts\activate
 python -m app.main
 ```
+
+### Performance Considerations
+
+- spaCy models can be memory-intensive. For production deployments, consider using a machine with at least 4GB RAM.
+- The first request may be slow as models are loaded into memory. Subsequent requests will be faster.
+- For high-traffic applications, consider scaling horizontally with multiple containers behind a load balancer.
 
 ### API Endpoints
 

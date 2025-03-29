@@ -14,6 +14,29 @@
 - 🎯 **Match Scoring**: Calculate an overall match score between resume and job description to help candidates assess their fit
 - 📘 **Course Recommendations**: Suggest the most relevant courses to acquire missing skills with potential score improvement metrics
 
+## Tech Stack
+
+### Frontend
+- **Framework**: Next.js 14+ (React framework)
+- **UI Libraries**: 
+  - Tailwind CSS for styling
+  - Shadcn UI for component library
+  - Lucide React for icons
+- **Language**: TypeScript
+- **State Management**: React Context API
+- **API Integration**: Fetch API
+- **Build Tools**: Node.js 18+, npm/yarn/pnpm
+
+### Backend
+- **Framework**: FastAPI (Python web framework)
+- **Machine Learning**:
+  - spaCy for NER models
+  - sentence-transformers for semantic matching
+  - scikit-learn for similarity metrics
+- **Language**: Python 3.10+
+- **Containerization**: Docker
+- **API Documentation**: Swagger UI / ReDoc (auto-generated)
+
 ## Core Components
 
 - Advanced NER pipeline for skill identification
@@ -22,23 +45,63 @@
 - Course recommendation engine with score improvement calculations
 - Modern, responsive UI with light/dark mode support
 
-## Setup
+## Installation & Setup
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- npm, yarn, or pnpm
+- Docker (optional, for containerized deployment)
 
 ### Backend
 
 ```bash
+# Clone the repository (if not done already)
+git clone https://github.com/yourusername/skill-bridge.git
+cd skill-bridge
+
+# Setup environment and install dependencies
 cd backend
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+
+# Run the server
 python -m app.main
 ```
+
+With Docker:
+```bash
+cd backend
+docker build -t skillbridge-backend .
+docker run -p 8000:8000 skillbridge-backend
+```
+
+The API will be available at http://localhost:8000 with documentation at http://localhost:8000/docs
 
 ### Frontend
 
 ```bash
+# Navigate to the client directory
 cd client
+
+# Install dependencies
 npm install
+# or: yarn install
+# or: pnpm install
+
+# Configure environment
+# Create a file named .env.local with:
+# NEXT_PUBLIC_API_URL='http://localhost:8000'
+
+# Run the development server
 npm run dev
+# or: yarn dev
+# or: pnpm dev
 ```
+
+The application will be available at http://localhost:3000
 
 See the README files in the backend and client directories for more detailed setup instructions.
 
