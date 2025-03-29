@@ -73,6 +73,32 @@ Dependencies are managed using `uv` for improved performance and reliability.
 - Docker (for containerized deployment)
 - Python 3.10+ (for local development)
 - uv (for dependency management)
+- **Supported Platforms**: Linux or Windows with WSL (Windows Subsystem for Linux)
+
+> **Important**: The backend server is designed to run on Linux-based systems. If you're using Windows, you must use Windows Subsystem for Linux (WSL) to run the backend. Some of the NLP libraries and dependencies may not work correctly on native Windows.
+
+#### Installing WSL (for Windows users)
+
+If you're on Windows, follow these steps to set up WSL:
+
+1. Open PowerShell as Administrator and run:
+   ```powershell
+   wsl --install
+   ```
+   This installs Ubuntu by default.
+
+2. Restart your computer when prompted.
+
+3. After restart, a terminal will open automatically. Create your Linux username and password.
+
+4. Update your Linux distribution:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+5. You can now access your WSL environment anytime by typing `wsl` in the command prompt or using the Windows Terminal.
+
+6. For Docker integration with WSL, make sure to enable the WSL integration in Docker Desktop settings.
 
 #### Installing Python
 
@@ -392,6 +418,35 @@ Once the server is running, you can access the automatic API documentation at:
 3. **Container exits immediately**:
    - Check logs with `docker logs [container_id]`
    - Ensure your Dockerfile has the correct CMD command
+
+#### WSL Issues (Windows Users)
+
+1. **WSL not available or WSL 2 required**:
+   ```
+   Error: WSL is not enabled on this machine
+   ```
+   - Enable WSL by running `dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart` in PowerShell as administrator
+   - Enable Virtual Machine Platform with `dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`
+   - Restart your computer
+   - Set WSL 2 as default: `wsl --set-default-version 2`
+
+2. **Docker Desktop not connecting to WSL**:
+   - In Docker Desktop, go to Settings > Resources > WSL Integration
+   - Enable integration with your Linux distribution
+   - Restart Docker Desktop
+
+3. **Performance issues with WSL**:
+   - Add memory limits to WSL by creating a `.wslconfig` file in your Windows user directory with:
+     ```
+     [wsl2]
+     memory=4GB
+     processors=2
+     ```
+   - Restart WSL with `wsl --shutdown` then reopen
+
+4. **File permission issues**:
+   - When accessing WSL files from Windows, use the Linux file system: `\\wsl$\Ubuntu\home\username\...`
+   - When using git in WSL, configure: `git config --global core.autocrlf input`
 
 #### Python Environment Issues
 

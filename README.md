@@ -65,6 +65,28 @@
 - Docker (for containerized deployment)
 - Node.js and npm (if running frontend locally)
 - Python 3.10+ (if running backend locally)
+- **Supported Platforms**: Linux or Windows with WSL (Windows Subsystem for Linux)
+
+> **Note for Windows Users**: The backend server is designed to run on Linux-based systems. If you're using Windows, we recommend using Windows Subsystem for Linux (WSL) to run the backend. The frontend can run directly on Windows.
+
+#### Installing WSL (for Windows users)
+
+1. Open PowerShell as Administrator and run:
+   ```powershell
+   wsl --install
+   ```
+   This installs Ubuntu by default.
+
+2. Restart your computer when prompted.
+
+3. After restart, a terminal will open automatically. Create your Linux username and password.
+
+4. Update your Linux distribution:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+5. You can now access your WSL environment anytime by typing `wsl` in the command prompt or using the Windows Terminal.
 
 #### Installing Docker
 
