@@ -2,11 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { SemanticSkillComparisonResponse, MatchDetail } from "@/lib/api"
+import { SkillComparisonData, MatchDetail } from "@/lib/api"
 import { Progress } from "@/components/ui/progress"
 
 interface SkillComparisonDisplayProps {
-  comparisonResults: SemanticSkillComparisonResponse
+  comparisonResults: SkillComparisonData
 }
 
 export function SkillComparisonDisplay({ comparisonResults }: SkillComparisonDisplayProps) {

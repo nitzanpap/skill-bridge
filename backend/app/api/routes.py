@@ -59,21 +59,25 @@ async def recommend_courses(request: CourseRecommendationRequest):
     5. Processing of LLM outputs to provide structured course recommendations with URLs
     """
     try:
-        # First get the skill gap using the NLP service
+        # First get the skill comparison using the NLP service
         skill_comparison = NLPService.compare_skills_semantic(
             request.resume_text,
             request.job_description_text,
             threshold=request.threshold,
         )
 
-        # Convert missing skills to set for RAG service
-        missing_skills = set(skill_comparison["missing_skills"])
+        # Extract all job skills from the skill comparison (both matched and missing)
+        # This ensures we have the complete list of job skills with their similarity scores
+        all_job_skills = set(
+            skill_comparison["matched_skills"] + skill_comparison["missing_skills"]
+        )
 
         # Generate course recommendations using RAG service
+        # Pass ALL job skills as ground_truth_skills, not just missing skills
         recommendations = RAGService.generate_course_recommendations(
             request.job_description_text,
             request.resume_text,
-            ground_truth_skills=missing_skills,
+            ground_truth_skills=all_job_skills,
         )
 
         # Convert the recommendations to the response model
@@ -83,6 +87,7 @@ async def recommend_courses(request: CourseRecommendationRequest):
             job_skills=recommendations["job_skills"],
             user_skills=recommendations["user_skills"],
             recommendations_text=recommendations["recommendations_text"],
+            matching_details=skill_comparison["matching_details"],
         )
     except Exception as e:
         raise HTTPException(

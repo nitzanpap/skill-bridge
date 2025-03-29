@@ -87,8 +87,10 @@ class RAGService:
 
         # Extract skills using NLP service
         if ground_truth_skills is not None:
+            # If ground truth skills are provided, use them directly
             job_skills = set(ground_truth_skills)
         else:
+            # Otherwise extract job skills from the job description
             job_entities = NLPService.extract_distinct_entities_from_all_models(
                 job_description
             )
@@ -98,6 +100,7 @@ class RAGService:
                 if e.label.upper() in ("SKILL", "PRODUCT", "ORG", "GPE", "LANGUAGE")
             }
 
+        # Extract user skills
         user_entities = NLPService.extract_distinct_entities_from_all_models(user_data)
         user_skills = {
             e.text
