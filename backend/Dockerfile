@@ -3,11 +3,15 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
+# install uv.
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Copy requirements file
-COPY requirements.txt .
+COPY pyproject.toml .
+COPY uv.lock .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv sync
 
 # Copy application code
 COPY . .
@@ -16,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # Command to run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+CMD ["./run.sh"] 

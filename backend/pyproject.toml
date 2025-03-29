@@ -1,0 +1,15 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "cohere>=5.14.0",
+    "dotenv>=0.9.9",
+    "fastapi>=0.115.12",
+    "pinecone>=6.0.2",
+    "sentence-transformers>=4.0.1",
+    "spacy>=3.8.4",
+    "uvicorn>=0.34.0",
+]
