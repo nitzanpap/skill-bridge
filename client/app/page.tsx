@@ -1,13 +1,23 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useCallback } from "react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./components/theme-toggle"
 import { TextInput } from "./components/text-input"
 import { ModelSelection } from "./components/model-selection"
 import { ResultsDisplay } from "./components/results-display"
 import { Loader2 } from "lucide-react"
+import { analyzeText, analyzeTextAllModels, Entity } from "@/lib/api"
+import { transformEntitiesForUI, entityTypeColors } from "@/lib/utils"
+import { toast } from "@/components/ui/use-toast"
 
 // Sample job descriptions for quick testing
 const sampleTexts = {
@@ -18,22 +28,11 @@ const sampleTexts = {
   "product-manager": `Product Manager needed with 3+ years of experience in SaaS products. Must have excellent communication skills and experience with Agile methodologies, JIRA, and product roadmapping tools. Knowledge of UX design principles and basic understanding of web technologies is required. The role involves collaboration with engineering teams at ProductCo in Austin, Texas.`,
 }
 
-// Entity types and their corresponding colors
-const entityTypes = {
-  Skills: "bg-pink-500",
-  Tools: "bg-teal-500",
-  Languages: "bg-orange-500",
-  Organizations: "bg-green-500",
-  Locations: "bg-purple-500",
-  Dates: "bg-red-500",
-  Products: "bg-indigo-500",
-  People: "bg-blue-500",
-}
-
 export default function Home() {
   const [inputText, setInputText] = useState("")
   const [selectedModels, setSelectedModels] = useState<string[]>(["all"])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [processingStatus, setProcessingStatus] = useState<string>("")
   const [results, setResults] = useState<null | {
     highlightedText: string
     entities: Record<string, string[]>
@@ -61,54 +60,81 @@ export default function Home() {
     setInputText(sampleTexts[sampleKey as keyof typeof sampleTexts])
   }
 
-  const analyzeText = () => {
+  const analyzeInputText = useCallback(async () => {
     if (!inputText.trim()) return
 
     setIsAnalyzing(true)
+    setResults(null)
+    setProcessingStatus("Requesting data from API...")
 
-    // Simulate API call with setTimeout
-    setTimeout(() => {
-      // Mock results based on the input text
-      const mockEntities: Record<string, string[]> = {
-        Skills: ["problem-solving", "communication"],
-        Tools: ["React", "Node.js", "AWS", "Docker", "CI/CD", "JIRA"],
-        Languages: ["TypeScript", "Python", "R", "SQL"],
-        Organizations: ["TechCorp", "DataTech", "ProductCo"],
-        Locations: ["San Francisco", "New York City", "Austin, Texas"],
-        Dates: ["January 2024", "5+ years", "3+ years"],
-        Products: ["TensorFlow", "PyTorch", "Tableau", "Power BI", "Hadoop", "Spark"],
-        People: ["Engineering Manager"],
+    try {
+      const apiStartTime = performance.now()
+      let entities: Entity[] = []
+
+      // Check if "all" is selected or if specific models are selected
+      if (selectedModels.includes("all")) {
+        entities = await analyzeTextAllModels(inputText)
+      } else {
+        // If multiple models are selected, get results from first selected model
+        // (backend doesn't support multiple specific models in one call)
+        entities = await analyzeText(inputText, selectedModels[0])
       }
 
-      // Filter entities based on what's actually in the input text
-      const filteredEntities: Record<string, string[]> = {}
-      Object.entries(mockEntities).forEach(([category, items]) => {
-        const found = items.filter((item) => inputText.toLowerCase().includes(item.toLowerCase()))
-        if (found.length > 0) {
-          filteredEntities[category] = found
-        }
-      })
+      const apiEndTime = performance.now()
+      setProcessingStatus(
+        `API response received (${Math.round(apiEndTime - apiStartTime)}ms). Processing entities...`
+      )
 
-      // Create highlighted text by wrapping entities with span tags
-      let highlightedText = inputText
-      Object.entries(filteredEntities).forEach(([category, items]) => {
-        items.forEach((item) => {
-          const regex = new RegExp(`\\b${item}\\b`, "gi")
-          highlightedText = highlightedText.replace(
-            regex,
-            `<span class="entity ${entityTypes[category as keyof typeof entityTypes]}">${item}</span>`,
-          )
+      // Validate entities before transforming
+      if (!Array.isArray(entities)) {
+        throw new Error("Invalid response format from API")
+      }
+
+      // Check if entities is empty
+      if (entities.length === 0) {
+        toast({
+          title: "No entities found",
+          description: "No entities were detected in the provided text.",
         })
-      })
+        setIsAnalyzing(false)
+        return
+      }
 
-      setResults({
-        highlightedText,
-        entities: filteredEntities,
-      })
+      // For larger texts or many entities, use requestAnimationFrame to avoid UI blocking
+      window.requestAnimationFrame(() => {
+        const transformStartTime = performance.now()
 
+        // Transform the response into the format expected by the UI
+        const transformedResults = transformEntitiesForUI(entities, inputText)
+
+        const transformEndTime = performance.now()
+        console.log(
+          `Entity transformation took: ${Math.round(transformEndTime - transformStartTime)}ms`
+        )
+
+        setResults(transformedResults)
+        setIsAnalyzing(false)
+      })
+    } catch (error) {
+      console.error("Error analyzing text:", error)
+
+      // More specific error messages based on error type
+      if (error instanceof TypeError) {
+        toast({
+          title: "Data Format Error",
+          description: "There was an issue with the data format from the API.",
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Analysis Failed",
+          description: "We couldn't analyze your text. Please try again later.",
+          variant: "destructive",
+        })
+      }
       setIsAnalyzing(false)
-    }, 1500)
-  }
+    }
+  }, [inputText, selectedModels])
 
   return (
     <div className="min-h-screen bg-background">
@@ -127,7 +153,9 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle>Text Analysis</CardTitle>
-              <CardDescription>Enter a job description or resume to extract skills and other entities</CardDescription>
+              <CardDescription>
+                Enter a job description or resume to extract skills and other entities
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-6">
@@ -136,23 +164,42 @@ export default function Home() {
                 <div className="grid gap-2">
                   <h3 className="text-sm font-medium">Sample Texts</h3>
                   <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleSampleSelection("software-engineer")}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSampleSelection("software-engineer")}
+                    >
                       Software Engineer
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleSampleSelection("data-scientist")}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSampleSelection("data-scientist")}
+                    >
                       Data Scientist
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleSampleSelection("product-manager")}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSampleSelection("product-manager")}
+                    >
                       Product Manager
                     </Button>
                   </div>
                 </div>
 
-                <ModelSelection selectedModels={selectedModels} onModelSelect={handleModelSelection} />
+                <ModelSelection
+                  selectedModels={selectedModels}
+                  onModelSelect={handleModelSelection}
+                />
               </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={analyzeText} disabled={!inputText.trim() || isAnalyzing} className="w-full sm:w-auto">
+            <CardFooter className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+              <Button
+                onClick={analyzeInputText}
+                disabled={!inputText.trim() || isAnalyzing}
+                className="w-full sm:w-auto"
+              >
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -162,6 +209,9 @@ export default function Home() {
                   "Analyze Text"
                 )}
               </Button>
+              {isAnalyzing && processingStatus && (
+                <p className="text-sm text-muted-foreground">{processingStatus}</p>
+              )}
             </CardFooter>
           </Card>
 
@@ -169,7 +219,7 @@ export default function Home() {
             <ResultsDisplay
               highlightedText={results.highlightedText}
               entities={results.entities}
-              entityTypes={entityTypes}
+              entityTypes={entityTypeColors}
             />
           )}
         </div>
@@ -177,4 +227,3 @@ export default function Home() {
     </div>
   )
 }
-
