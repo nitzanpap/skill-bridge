@@ -44,6 +44,31 @@ class CombinedAnalysisResponse(BaseModel):
     )
 
 
+class CompareSkillsRequest(BaseModel):
+    """Request schema for comparing resume skills against job requirements."""
+
+    resume_text: str = Field(..., description="The resume text to analyze")
+    job_description_text: str = Field(
+        ..., description="The job description text to analyze"
+    )
+
+
+class SkillComparisonResponse(BaseModel):
+    """Response schema for skill comparison results."""
+
+    resume_skills: List[Entity] = Field(
+        default_factory=list,
+        description="Skills found in the resume",
+    )
+    job_skills: List[Entity] = Field(
+        default_factory=list, description="Skills required by the job"
+    )
+    missing_skills: List[Entity] = Field(
+        default_factory=list,
+        description="Skills in the job description but not in the resume",
+    )
+
+
 class ModelsResponse(BaseModel):
     """Response schema for available models."""
 

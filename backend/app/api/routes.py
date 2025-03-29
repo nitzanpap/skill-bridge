@@ -9,7 +9,9 @@ from ..models.schemas import (
     AnalysisResponse,
     CombinedAnalysisRequest,
     CombinedAnalysisResponse,
+    CompareSkillsRequest,
     ModelsResponse,
+    SkillComparisonResponse,
 )
 from ..services.nlp_service import NLPService
 
@@ -54,3 +56,23 @@ async def list_models():
     """
     models = NLPService.list_models()
     return ModelsResponse(available_models=models)
+
+
+@router.post("/compare-skills", response_model=SkillComparisonResponse)
+async def compare_skills(request: CompareSkillsRequest):
+    """
+    Compare skills between resume and job description.
+    """
+    try:
+        result = NLPService.compare_skills(
+            request.resume_text, request.job_description_text
+        )
+        return SkillComparisonResponse(
+            resume_skills=result["resume_skills"],
+            job_skills=result["job_skills"],
+            missing_skills=result["missing_skills"],
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error processing request: {str(e)}"
+        )

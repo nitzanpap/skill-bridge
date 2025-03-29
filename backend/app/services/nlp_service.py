@@ -78,3 +78,50 @@ class NLPService:
             List of model names
         """
         return ModelLoader.list_available_models()
+
+    @staticmethod
+    def compare_skills(resume_text: str, job_description_text: str) -> dict:
+        """
+        Compare skills between resume and job description.
+
+        Args:
+            resume_text: The resume text to analyze
+            job_description_text: The job description text to analyze
+
+        Returns:
+            Dictionary containing resume skills, job skills, and missing skills
+        """
+        # Extract skills from both texts using all models
+        resume_entities = NLPService.extract_distinct_entities_from_all_models(
+            resume_text
+        )
+        job_entities = NLPService.extract_distinct_entities_from_all_models(
+            job_description_text
+        )
+
+        # Filter for skills only (typically these would have label 'SKILL')
+        # Note: You may need to adjust this based on how your models label skills
+        resume_skills = [
+            e
+            for e in resume_entities
+            if e.label.upper() in ("SKILL", "PRODUCT", "ORG", "GPE", "LANGUAGE")
+        ]
+        job_skills = [
+            e
+            for e in job_entities
+            if e.label.upper() in ("SKILL", "PRODUCT", "ORG", "GPE", "LANGUAGE")
+        ]
+
+        # Find missing skills (in job but not in resume)
+        resume_skill_texts = {skill.text.lower() for skill in resume_skills}
+        missing_skills = [
+            skill
+            for skill in job_skills
+            if skill.text.lower() not in resume_skill_texts
+        ]
+
+        return {
+            "resume_skills": resume_skills,
+            "job_skills": job_skills,
+            "missing_skills": missing_skills,
+        }
