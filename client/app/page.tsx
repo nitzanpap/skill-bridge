@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
 import {
   Card,
@@ -71,8 +71,14 @@ export default function Home() {
   const [processingStatus, setProcessingStatus] = useState<string>("")
   const [skillData, setSkillData] = useState<SkillComparisonData | null>(null)
   const [recommendationData, setRecommendationData] = useState<SkillBridgeResponse | null>(null)
-  // If the app is on dark mode, use the 'logo-dark.png' image, otherwise use the 'logo-light.png' image
-  const logoImage = useTheme().theme === "dark" ? "/logo-dark.png" : "/logo-light.png"
+  // Use a state variable for the logo with a fixed initial value
+  const [logoImage, setLogoImage] = useState("/logo-light.png")
+  const { theme } = useTheme()
+
+  // Update logo based on theme changes, but only on the client side
+  useEffect(() => {
+    setLogoImage(theme === "dark" ? "/logo-dark.png" : "/logo-light.png")
+  }, [theme])
 
   const handleSampleSelection = (sampleKey: string) => {
     if (sampleKey.includes("resume")) {
