@@ -88,7 +88,8 @@ export function CourseRecommendationsDisplay({
                         <div className="flex flex-wrap gap-2 mt-1">
                           {isHighestScore ? (
                             <>
-                              <div className="bg-blue-100 dark:bg-blue-900 p-1 px-3 rounded-md flex items-center shadow-md scale-in">
+                              {/* // TODO: Add back in */}
+                              {/* <div className="bg-blue-100 dark:bg-blue-900 p-1 px-3 rounded-md flex items-center shadow-md scale-in">
                                 <TrendingUp className="h-4 w-4 text-blue-700 dark:text-blue-300 mr-1" />
                                 <span className="text-blue-800 dark:text-blue-200 text-xs font-medium mr-1">
                                   Score:
@@ -96,7 +97,7 @@ export function CourseRecommendationsDisplay({
                                 <span className="text-blue-800 dark:text-blue-200 text-xl font-extrabold animate-glow-text">
                                   {potentialScoreValue}%
                                 </span>
-                              </div>
+                              </div> */}
                               <div className="bg-green-100 dark:bg-green-900/40 border border-green-200 dark:border-green-800 p-1 px-3 rounded-md flex items-center shadow-md scale-in">
                                 <ArrowUp className="h-4 w-4 text-green-700 dark:text-green-300 mr-1" />
                                 <span className="text-green-800 dark:text-green-200 text-xl font-extrabold animate-glow-text">
@@ -109,12 +110,13 @@ export function CourseRecommendationsDisplay({
                             </>
                           ) : (
                             <>
-                              <Badge
+                              {/* // TODO: Add back in */}
+                              {/* <Badge
                                 variant="secondary"
                                 className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                               >
                                 Potential Score: {potentialScoreValue}%
-                              </Badge>
+                              </Badge> */}
                               <Badge
                                 variant="outline"
                                 className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200"
