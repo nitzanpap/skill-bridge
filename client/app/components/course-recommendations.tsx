@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Star, ArrowUp, TrendingUp } from "lucide-react"
 import { SkillBridgeResponse } from "@/lib/api"
 
 interface CourseRecommendationsDisplayProps {
@@ -57,36 +57,73 @@ export function CourseRecommendationsDisplay({
             <div className="space-y-4">
               {recommended_courses.map((course, index) => {
                 const isHighestScore = course.potential_score === maxPotentialScore
+                const potentialScoreValue = course.potential_score?.toFixed(1) || "0.0"
+                const scoreImprovement = course.score_improvement?.toFixed(1) || "0.0"
+
                 return (
                   <div
                     key={index}
-                    className={`flex flex-col space-y-2 rounded-lg border p-4 transition-all 
+                    className={`flex flex-col space-y-2 rounded-lg border p-4 transition-all relative
                       ${
                         isHighestScore
-                          ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                          ? "border-green-500 border-2 bg-green-50 dark:bg-green-950/20 shadow-lg animate-pulse-shadow"
                           : "hover:bg-accent/50"
                       }`}
                   >
+                    {isHighestScore && (
+                      <div className="absolute -top-3 -right-3 bg-green-500 text-white rounded-full p-1">
+                        <Star className="h-5 w-5 fill-white" />
+                      </div>
+                    )}
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-semibold">
+                        <h3
+                          className={`font-semibold ${
+                            isHighestScore ? "text-green-700 dark:text-green-300" : ""
+                          }`}
+                        >
                           {index + 1}. {course.course_name}
                         </h3>
                         <div className="flex flex-wrap gap-2 mt-1">
-                          <Badge
-                            variant="secondary"
-                            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                          >
-                            Potential Score: {course.potential_score?.toFixed(1) || "0.0"}%
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200"
-                          >
-                            +{course.score_improvement?.toFixed(1) || "0.0"}% improvement
-                          </Badge>
+                          {isHighestScore ? (
+                            <>
+                              <div className="bg-blue-100 dark:bg-blue-900 p-1 px-3 rounded-md flex items-center shadow-md scale-in">
+                                <TrendingUp className="h-4 w-4 text-blue-700 dark:text-blue-300 mr-1" />
+                                <span className="text-blue-800 dark:text-blue-200 text-xs font-medium mr-1">
+                                  Score:
+                                </span>
+                                <span className="text-blue-800 dark:text-blue-200 text-xl font-extrabold animate-glow-text">
+                                  {potentialScoreValue}%
+                                </span>
+                              </div>
+                              <div className="bg-green-100 dark:bg-green-900/40 border border-green-200 dark:border-green-800 p-1 px-3 rounded-md flex items-center shadow-md scale-in">
+                                <ArrowUp className="h-4 w-4 text-green-700 dark:text-green-300 mr-1" />
+                                <span className="text-green-800 dark:text-green-200 text-xl font-extrabold animate-glow-text">
+                                  +{scoreImprovement}%
+                                </span>
+                                <span className="text-green-800 dark:text-green-200 text-xs font-medium ml-1">
+                                  boost
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <Badge
+                                variant="secondary"
+                                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              >
+                                Potential Score: {potentialScoreValue}%
+                              </Badge>
+                              <Badge
+                                variant="outline"
+                                className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200"
+                              >
+                                +{scoreImprovement}% improvement
+                              </Badge>
+                            </>
+                          )}
                           {isHighestScore && (
-                            <Badge className="bg-green-500 text-white">Best Match</Badge>
+                            <Badge className="bg-green-500 text-white font-bold">Best Match</Badge>
                           )}
                         </div>
                       </div>
