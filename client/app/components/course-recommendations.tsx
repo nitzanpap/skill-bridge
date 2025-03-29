@@ -15,6 +15,11 @@ export function CourseRecommendationsDisplay({
 }: CourseRecommendationsDisplayProps) {
   const { recommended_courses, skill_gap } = recommendations
 
+  // Find the course with the highest potential score
+  const maxPotentialScore = Math.max(
+    ...recommended_courses.map((course) => course.potential_score || 0)
+  )
+
   return (
     <div className="grid gap-6">
       {/* Main Recommendations Card */}
@@ -50,36 +55,63 @@ export function CourseRecommendationsDisplay({
 
             {/* Course Cards */}
             <div className="space-y-4">
-              {recommended_courses.map((course, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col space-y-2 rounded-lg border p-4 transition-all hover:bg-accent/50"
-                >
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-semibold">
-                      {index + 1}. {course.course_name}
-                    </h3>
-                    {course.url && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 gap-1"
-                        onClick={() => window.open(course.url, "_blank")}
-                      >
-                        <ExternalLink size={14} />
-                        <span className="hidden sm:inline">Visit Course</span>
-                      </Button>
+              {recommended_courses.map((course, index) => {
+                const isHighestScore = course.potential_score === maxPotentialScore
+                return (
+                  <div
+                    key={index}
+                    className={`flex flex-col space-y-2 rounded-lg border p-4 transition-all 
+                      ${
+                        isHighestScore
+                          ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                          : "hover:bg-accent/50"
+                      }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold">
+                          {index + 1}. {course.course_name}
+                        </h3>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <Badge
+                            variant="secondary"
+                            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          >
+                            Potential Score: {course.potential_score?.toFixed(1) || "0.0"}%
+                          </Badge>
+                          <Badge
+                            variant="outline"
+                            className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200"
+                          >
+                            +{course.score_improvement?.toFixed(1) || "0.0"}% improvement
+                          </Badge>
+                          {isHighestScore && (
+                            <Badge className="bg-green-500 text-white">Best Match</Badge>
+                          )}
+                        </div>
+                      </div>
+                      {course.url && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 gap-1"
+                          onClick={() => window.open(course.url, "_blank")}
+                        >
+                          <ExternalLink size={14} />
+                          <span className="hidden sm:inline">Visit Course</span>
+                        </Button>
+                      )}
+                    </div>
+                    {course.description && (
+                      <p className="text-sm text-muted-foreground">
+                        {course.description.length > 200
+                          ? `${course.description.substring(0, 200)}...`
+                          : course.description}
+                      </p>
                     )}
                   </div>
-                  {course.description && (
-                    <p className="text-sm text-muted-foreground">
-                      {course.description.length > 200
-                        ? `${course.description.substring(0, 200)}...`
-                        : course.description}
-                    </p>
-                  )}
-                </div>
-              ))}
+                )
+              })}
 
               {recommended_courses.length === 0 && (
                 <p className="rounded-lg border border-dashed p-6 text-center text-muted-foreground">
