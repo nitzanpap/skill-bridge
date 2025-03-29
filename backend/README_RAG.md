@@ -139,4 +139,8 @@ Title,Category,Sub-Category,Short Intro,Skills,url
 - **Missing Dependencies**: Ensure all required packages are installed via `pip install -r requirements.txt`
 - **API Key Issues**: Verify your Pinecone and Cohere API keys are correct
 - **Index Creation Failures**: Check Pinecone account limits and permissions
-- **Embedding Errors**: Make sure your course data is properly formatted and contains valid text 
+- **Embedding Errors**: Make sure your course data is properly formatted and contains valid text
+- **Pinecone API Errors**:
+  - If you see errors about `$contains is not a valid operator`, this means your Pinecone filter syntax is incorrect. The RAG service should avoid using MongoDB-style operators in filters and instead use Pinecone's supported filtering syntax or perform filtering programmatically.
+  - Make sure you're using the `pinecone` package (not `pinecone-client` which is deprecated) and the correct import statement `from pinecone import Pinecone`
+  - Different versions of Pinecone may have different query syntax. Refer to the latest [Pinecone documentation](https://docs.pinecone.io/) for the correct syntax.

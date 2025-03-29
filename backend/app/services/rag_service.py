@@ -208,15 +208,31 @@ class RAGService:
             model = cls._get_model()
             query_vector = model.encode(course_name).tolist()
 
-            # Search for the course in Pinecone
+            # Search for the course in Pinecone without filtering
             results = index.query(
                 vector=query_vector,
-                top_k=5,
+                top_k=10,
                 include_metadata=True,
-                filter={"Title": {"$contains": course_name}},
             )["matches"]
 
-            if results:
+            # Filter results programmatically
+            found_match = False
+            for result in results:
+                title = result["metadata"].get("Title", "")
+                # Check if the course_name is part of the title (case-insensitive)
+                if course_name.lower() in title.lower():
+                    courses_data.append(
+                        {
+                            "course_name": course_name,
+                            "url": result["metadata"].get("url", ""),
+                            "description": result["metadata"].get("course_desc", ""),
+                        }
+                    )
+                    found_match = True
+                    break
+
+            # If no match found, use the best semantic match
+            if not found_match and results:
                 best_match = results[0]
                 courses_data.append(
                     {
@@ -225,8 +241,8 @@ class RAGService:
                         "description": best_match["metadata"].get("course_desc", ""),
                     }
                 )
-            else:
-                # Fallback: add without URL if not found
+            elif not found_match:
+                # Fallback: add without URL if nothing found
                 courses_data.append(
                     {"course_name": course_name, "url": "", "description": ""}
                 )
