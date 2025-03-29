@@ -29,6 +29,8 @@ Then access API at http://localhost:8000/docs
 - Serves custom-trained spaCy NER models via REST API
 - Semantic matching of skills using sentence-transformers
 - Match scoring between resume and job requirements
+- Course recommendation algorithm based on identified skill gaps
+- Score improvement predictions for recommended courses
 - Built with FastAPI for speed and modern tooling
 - Clean architecture principles for maintainability
 - Docker support for easy deployment
@@ -173,6 +175,45 @@ Response:
 
 This endpoint extracts skills from both the resume and job description using NER, then compares them semantically using sentence transformers to identify matches even when terms aren't exactly the same (e.g., "ML" and "Machine Learning").
 
+#### Course Recommendations
+
+```
+POST /api/v1/recommend-courses
+```
+
+Request:
+```json
+{
+  "skill_gap": ["deep learning", "TensorFlow", "PyTorch"],
+  "current_score": 65.0
+}
+```
+
+Response:
+```json
+{
+  "recommended_courses": [
+    {
+      "course_name": "Deep Learning Specialization",
+      "description": "Learn the foundations of Deep Learning, understand how to build neural networks, and learn how to lead successful machine learning projects.",
+      "url": "https://www.coursera.org/specializations/deep-learning",
+      "potential_score": 85.5,
+      "score_improvement": 20.5
+    },
+    {
+      "course_name": "PyTorch for Deep Learning",
+      "description": "Learn the basics of deep learning and PyTorch, and build your first neural networks.",
+      "url": "https://www.udemy.com/course/pytorch-for-deep-learning",
+      "potential_score": 78.0,
+      "score_improvement": 13.0
+    }
+  ],
+  "skill_gap": ["deep learning", "TensorFlow", "PyTorch"]
+}
+```
+
+This endpoint takes a list of missing skills and the current job match score, then recommends courses to help close the skill gap along with predicted score improvements.
+
 #### Analyze Text
 
 ```
@@ -257,7 +298,8 @@ backend/
 │   │   └── routes.py        # HTTP endpoints
 │   ├── services/
 │   │   ├── nlp_service.py   # Business logic (spaCy inference)
-│   │   └── similarity_service.py   # Semantic similarity computation
+│   │   ├── similarity_service.py   # Semantic similarity computation
+│   │   └── recommendation_service.py   # Course recommendation algorithm
 │   ├── models/
 │   │   └── schemas.py       # Pydantic request/response schemas
 │   ├── core/
@@ -277,3 +319,4 @@ Configure the application by setting the following environment variables in the 
 - `MODELS_DIR`: Directory containing the spaCy models (default: `./models`)
 - `DEFAULT_MODEL`: Default model to use when none is specified (default: `ner_model_20000`)
 - `ALLOWED_ORIGINS`: CORS allowed origins (default: `*`) 
+- `COURSE_API_KEY`: API key for accessing course data (if applicable)
