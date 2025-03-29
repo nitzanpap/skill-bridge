@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import Image from "next/image"
 import {
   Card,
   CardContent,
@@ -22,6 +23,7 @@ import {
   SkillComparisonData,
 } from "@/lib/api"
 import { toast } from "@/components/ui/use-toast"
+import { useTheme } from "next-themes"
 
 // Sample texts for quick testing
 const sampleTexts = {
@@ -69,6 +71,8 @@ export default function Home() {
   const [processingStatus, setProcessingStatus] = useState<string>("")
   const [skillData, setSkillData] = useState<SkillComparisonData | null>(null)
   const [recommendationData, setRecommendationData] = useState<SkillBridgeResponse | null>(null)
+  // If the app is on dark mode, use the 'logo-dark.png' image, otherwise use the 'logo-light.png' image
+  const logoImage = useTheme().theme === "dark" ? "/logo-dark.png" : "/logo-light.png"
 
   const handleSampleSelection = (sampleKey: string) => {
     if (sampleKey.includes("resume")) {
@@ -125,10 +129,16 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="container flex h-32 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Skill Bridge</h1>
-            <p className="text-sm text-muted-foreground">Semantic Skill Matching Tool</p>
+            {/* <h1 className="text-3xl font-bold">Skill Bridge</h1> */}
+            <Image
+              src={logoImage}
+              alt="Skill Bridge Logo"
+              width={220}
+              height={220}
+              className="ml-2"
+            />
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />

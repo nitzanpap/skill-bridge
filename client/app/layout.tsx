@@ -11,6 +11,19 @@ export const metadata: Metadata = {
   title: "Skill Bridge - Entity Extraction Tool",
   description: "Identify skills and other entities from job descriptions and resumes",
   generator: "v0.dev",
+  icons: {
+    icon: [
+      { url: "/favicons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicons/favicon.ico" },
+    ],
+    apple: [{ url: "/favicons/apple-touch-icon.png" }],
+    other: [
+      { url: "/favicons/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicons/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+  },
+  manifest: "/favicons/site.webmanifest",
 }
 
 export default function RootLayout({
@@ -34,5 +47,3 @@ export default function RootLayout({
     </html>
   )
 }
-
-import "./globals.css"
