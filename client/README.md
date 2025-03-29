@@ -1,6 +1,6 @@
 # SkillBridge Frontend
 
-A modern web application for the SkillBridge platform. This client application provides an intuitive interface for resume analysis, job requirement matching, and skill gap identification using semantic matching technology.
+A modern web application for the SkillBridge platform. This client application provides an intuitive interface for resume analysis, job requirement matching, skill gap identification, and course recommendations using semantic matching technology.
 
 ## Features
 
@@ -8,6 +8,8 @@ A modern web application for the SkillBridge platform. This client application p
 - Semantic skill matching with adjustable similarity threshold
 - Comprehensive match score calculation
 - Detailed skill comparison visualization
+- Course recommendations based on identified skill gaps
+- Score improvement predictions for each recommended course
 - Modern, responsive UI with light/dark mode support
 
 ## Quick Start
@@ -58,6 +60,9 @@ The results will display:
 - A list of matched skills
 - A list of missing skills
 - Detailed matching information showing the similarity between each job skill and your closest matching skill
+- Personalized course recommendations to help bridge identified skill gaps
+- Predicted score improvements for each recommended course
+- Direct links to course platforms
 
 ## Project Structure
 
@@ -66,6 +71,7 @@ client/
 ├── app/                     # Next.js app directory
 │   ├── components/          # Reusable UI components
 │   │   ├── comparison-results.tsx   # Skill comparison results display
+│   │   ├── course-recommendations.tsx # Course recommendation display
 │   │   ├── text-input.tsx  # Text input components
 │   │   └── theme-toggle.tsx # Theme switcher component
 │   ├── page.tsx            # Main application page
@@ -83,9 +89,10 @@ client/
 
 ## API Integration
 
-The frontend communicates with the backend through a RESTful API. The main endpoint used is:
+The frontend communicates with the backend through a RESTful API. The main endpoints used are:
 
 - `POST /api/v1/compare-skills/semantic`: Compares resume skills against job requirements using semantic matching
+- `POST /api/v1/recommend-courses`: Gets course recommendations based on identified skill gaps
 
 See the `api.ts` file for implementation details.
 
