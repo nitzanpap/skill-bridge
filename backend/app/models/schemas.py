@@ -27,37 +27,7 @@ class MatchDetail(BaseModel):
     )
 
 
-class SemanticSkillComparisonRequest(BaseModel):
-    """Request schema for comparing resume skills against job requirements using semantic matching."""
-
-    resume_text: str = Field(..., description="The resume text to analyze")
-    job_description_text: str = Field(
-        ..., description="The job description text to analyze"
-    )
-    threshold: float = Field(
-        0.5, description="Similarity threshold for considering skills as a match"
-    )
-
-
-class SemanticSkillComparisonResponse(BaseModel):
-    """Response schema for semantic skill comparison results."""
-
-    score: float = Field(..., description="Overall match score as a percentage (0-100)")
-    matched_skills: List[str] = Field(
-        default_factory=list,
-        description="Skills from job description that matched with resume skills",
-    )
-    missing_skills: List[str] = Field(
-        default_factory=list,
-        description="Skills from job description that didn't match with any resume skills",
-    )
-    matching_details: List[MatchDetail] = Field(
-        default_factory=list,
-        description="Detailed matching information for each job skill",
-    )
-
-
-# New schemas for course recommendations
+# Course recommendation schemas
 
 
 class CourseRecommendation(BaseModel):
