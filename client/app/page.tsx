@@ -33,10 +33,7 @@ export default function Home() {
   const [selectedModels, setSelectedModels] = useState<string[]>(["all"])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [processingStatus, setProcessingStatus] = useState<string>("")
-  const [results, setResults] = useState<null | {
-    highlightedText: string
-    entities: Record<string, string[]>
-  }>(null)
+  const [entities, setEntities] = useState<Record<string, string[]> | null>(null)
 
   const handleModelSelection = (model: string) => {
     if (model === "all") {
@@ -64,20 +61,20 @@ export default function Home() {
     if (!inputText.trim()) return
 
     setIsAnalyzing(true)
-    setResults(null)
+    setEntities(null)
     setProcessingStatus("Requesting data from API...")
 
     try {
       const apiStartTime = performance.now()
-      let entities: Entity[] = []
+      let apiEntities: Entity[] = []
 
       // Check if "all" is selected or if specific models are selected
       if (selectedModels.includes("all")) {
-        entities = await analyzeTextAllModels(inputText)
+        apiEntities = await analyzeTextAllModels(inputText)
       } else {
         // If multiple models are selected, get results from first selected model
         // (backend doesn't support multiple specific models in one call)
-        entities = await analyzeText(inputText, selectedModels[0])
+        apiEntities = await analyzeText(inputText, selectedModels[0])
       }
 
       const apiEndTime = performance.now()
@@ -86,12 +83,12 @@ export default function Home() {
       )
 
       // Validate entities before transforming
-      if (!Array.isArray(entities)) {
+      if (!Array.isArray(apiEntities)) {
         throw new Error("Invalid response format from API")
       }
 
       // Check if entities is empty
-      if (entities.length === 0) {
+      if (apiEntities.length === 0) {
         toast({
           title: "No entities found",
           description: "No entities were detected in the provided text.",
@@ -100,21 +97,15 @@ export default function Home() {
         return
       }
 
-      // For larger texts or many entities, use requestAnimationFrame to avoid UI blocking
-      window.requestAnimationFrame(() => {
-        const transformStartTime = performance.now()
+      // Process the entities - much faster now without text highlighting
+      const transformStartTime = performance.now()
+      const groupedEntities = transformEntitiesForUI(apiEntities)
+      const transformEndTime = performance.now()
 
-        // Transform the response into the format expected by the UI
-        const transformedResults = transformEntitiesForUI(entities, inputText)
+      console.log(`Entity grouping took: ${Math.round(transformEndTime - transformStartTime)}ms`)
 
-        const transformEndTime = performance.now()
-        console.log(
-          `Entity transformation took: ${Math.round(transformEndTime - transformStartTime)}ms`
-        )
-
-        setResults(transformedResults)
-        setIsAnalyzing(false)
-      })
+      setEntities(groupedEntities)
+      setIsAnalyzing(false)
     } catch (error) {
       console.error("Error analyzing text:", error)
 
@@ -215,13 +206,7 @@ export default function Home() {
             </CardFooter>
           </Card>
 
-          {results && (
-            <ResultsDisplay
-              highlightedText={results.highlightedText}
-              entities={results.entities}
-              entityTypes={entityTypeColors}
-            />
-          )}
+          {entities && <ResultsDisplay entities={entities} entityTypes={entityTypeColors} />}
         </div>
       </main>
     </div>
