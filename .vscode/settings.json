@@ -16,5 +16,6 @@
     "streamlit",
     "upskilling",
     "venv"
-  ]
+  ],
+  "python.pythonPath": "${workspaceFolder}/backend/.venv/bin/python"
 }
