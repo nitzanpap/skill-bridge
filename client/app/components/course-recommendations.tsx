@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ExternalLink } from "lucide-react"
-import { CourseRecommendationResponse } from "@/lib/api"
+import { SkillBridgeResponse } from "@/lib/api"
 
 interface CourseRecommendationsDisplayProps {
-  recommendations: CourseRecommendationResponse
+  recommendations: SkillBridgeResponse
 }
 
 export function CourseRecommendationsDisplay({
