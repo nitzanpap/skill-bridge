@@ -1,7 +1,7 @@
 # interface.py
-import sys
-import spacy
 from pathlib import Path
+
+import spacy
 
 model1 = "ner_10000_word2vec_glassdoor"
 model2 = "ner_model_1000_word2vec"
@@ -25,12 +25,6 @@ def analyze_text(text: str, model_name: str):
 
 
 if __name__ == "__main__":
-    # if len(sys.argv) < 3:
-    #     print("Usage: python interface.py '<text>' <model_folder_name>")
-    #     sys.exit(1)
-
-    # text_input = sys.argv[1]
-    # model_folder = sys.argv[2]
 
     # Example usage
     example_text = """Geospatial Analyst: Job Description
