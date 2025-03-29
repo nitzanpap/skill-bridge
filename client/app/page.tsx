@@ -13,8 +13,14 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./components/theme-toggle"
 import { DualTextInput } from "./components/text-input"
 import { SkillComparisonDisplay } from "./components/comparison-results"
-import { Loader2 } from "lucide-react"
-import { compareSkillsSemantic, SemanticSkillComparisonResponse } from "@/lib/api"
+import { CourseRecommendationsDisplay } from "./components/course-recommendations"
+import { Loader2, BookOpen } from "lucide-react"
+import {
+  compareSkillsSemantic,
+  SemanticSkillComparisonResponse,
+  getCourseRecommendations,
+  CourseRecommendationResponse,
+} from "@/lib/api"
 import { toast } from "@/components/ui/use-toast"
 
 // Sample texts for quick testing
@@ -60,9 +66,13 @@ export default function Home() {
   const [jobDescriptionText, setJobDescriptionText] = useState("")
   const [threshold, setThreshold] = useState(0.5)
   const [isComparing, setIsComparing] = useState(false)
+  const [isGettingRecommendations, setIsGettingRecommendations] = useState(false)
   const [comparisonStatus, setComparisonStatus] = useState<string>("")
+  const [recommendationsStatus, setRecommendationsStatus] = useState<string>("")
   const [comparisonResults, setComparisonResults] =
     useState<SemanticSkillComparisonResponse | null>(null)
+  const [courseRecommendations, setCourseRecommendations] =
+    useState<CourseRecommendationResponse | null>(null)
 
   const handleSampleSelection = (sampleKey: string) => {
     if (sampleKey.includes("resume")) {
@@ -107,6 +117,46 @@ export default function Home() {
       })
 
       setIsComparing(false)
+    }
+  }, [resumeText, jobDescriptionText, threshold])
+
+  const getRecommendations = useCallback(async () => {
+    if (!resumeText.trim() || !jobDescriptionText.trim()) {
+      toast({
+        title: "Missing input",
+        description: "Please provide both resume and job description texts.",
+      })
+      return
+    }
+
+    setIsGettingRecommendations(true)
+    setCourseRecommendations(null)
+    setRecommendationsStatus("Finding course recommendations for your skill gap...")
+
+    try {
+      const apiStartTime = performance.now()
+
+      // Call the API to get course recommendations
+      const results = await getCourseRecommendations(resumeText, jobDescriptionText, threshold)
+
+      const apiEndTime = performance.now()
+      setRecommendationsStatus(
+        `Recommendations completed in ${Math.round(apiEndTime - apiStartTime)}ms.`
+      )
+
+      setCourseRecommendations(results)
+      setIsGettingRecommendations(false)
+    } catch (error) {
+      console.error("Error getting course recommendations:", error)
+
+      toast({
+        title: "Recommendations Failed",
+        description:
+          "We couldn't get course recommendations based on your skill gap. Please try again later.",
+        variant: "destructive",
+      })
+
+      setIsGettingRecommendations(false)
     }
   }, [resumeText, jobDescriptionText, threshold])
 
@@ -200,7 +250,7 @@ export default function Home() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+            <CardFooter className="flex flex-col space-y-2 items-start gap-2 sm:flex-row sm:items-center sm:space-y-0">
               <Button
                 onClick={compareResume}
                 disabled={!resumeText.trim() || !jobDescriptionText.trim() || isComparing}
@@ -215,14 +265,44 @@ export default function Home() {
                   "Compare Skills"
                 )}
               </Button>
+
+              <Button
+                onClick={getRecommendations}
+                disabled={
+                  !resumeText.trim() || !jobDescriptionText.trim() || isGettingRecommendations
+                }
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                {isGettingRecommendations ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Finding Courses...
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Recommend Courses
+                  </>
+                )}
+              </Button>
+
               {isComparing && comparisonStatus && (
                 <p className="text-sm text-muted-foreground">{comparisonStatus}</p>
+              )}
+              {isGettingRecommendations && recommendationsStatus && (
+                <p className="text-sm text-muted-foreground">{recommendationsStatus}</p>
               )}
             </CardFooter>
           </Card>
 
           {/* Display comparison results */}
           {comparisonResults && <SkillComparisonDisplay comparisonResults={comparisonResults} />}
+
+          {/* Display course recommendations */}
+          {courseRecommendations && (
+            <CourseRecommendationsDisplay recommendations={courseRecommendations} />
+          )}
         </div>
       </main>
     </div>
