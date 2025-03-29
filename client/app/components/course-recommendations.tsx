@@ -56,7 +56,8 @@ export function CourseRecommendationsDisplay({
             {/* Course Cards */}
             <div className="space-y-4">
               {recommended_courses.map((course, index) => {
-                const isHighestScore = course.potential_score === maxPotentialScore
+                const isHighestScore =
+                  course.potential_score === maxPotentialScore && course.score_improvement > 0
                 const potentialScoreValue = course.potential_score?.toFixed(1) || "0.0"
                 const scoreImprovement = course.score_improvement?.toFixed(1) || "0.0"
 
