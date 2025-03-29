@@ -28,28 +28,89 @@ A modern web application for the SkillBridge platform. This client application p
   - npm/yarn/pnpm package management
   - ESLint for code quality
   - Prettier for code formatting
+- **Deployment**:
+  - Docker for containerization
+  - Vercel/Netlify for production hosting (optional)
 
 ## Requirements
 
 - Node.js 18.x or later
 - npm 9.x or later (or equivalent yarn/pnpm)
+- Docker (for containerized deployment)
 - Modern browser with ES6+ support
 
 ## Quick Start
 
 ### Prerequisites
 
-Before installation, ensure you have Node.js and npm (or yarn/pnpm) installed:
+- Docker (for containerized deployment)
+- Node.js 18+ and npm (for local development)
 
+#### Installing Docker
+
+Docker allows you to run applications in containers, making setup much easier:
+
+1. Download and install Docker Desktop from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+2. Follow the installation wizard instructions for your operating system
+3. After installation, start Docker Desktop
+4. Verify installation by running `docker --version` in your terminal/command prompt
+
+#### Installing Node.js using NVM (recommended)
+
+NVM (Node Version Manager) helps you manage multiple Node.js versions:
+
+**For macOS/Linux:**
 ```bash
-# Check your Node.js version
-node --version  # Should be 18.x or higher
+# Install NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
-# Check your npm version
-npm --version   # Should be 9.x or higher
+# Reload your terminal profile
+source ~/.bashrc  # or ~/.zshrc if using zsh
+
+# Verify NVM installation
+nvm --version
+
+# Install Node.js 18
+nvm install 18
+
+# Use Node.js 18
+nvm use 18
+
+# Verify Node.js installation
+node --version
+npm --version
 ```
 
-### Installation
+**For Windows:**
+1. Install NVM for Windows from [https://github.com/coreybutler/nvm-windows/releases](https://github.com/coreybutler/nvm-windows/releases)
+2. Download and run the nvm-setup.exe file
+3. Open a new Command Prompt and run:
+```cmd
+nvm install 18
+nvm use 18
+node --version
+npm --version
+```
+
+### Setup Options
+
+#### Option 1: Docker Setup (Recommended)
+
+Build and run the client application using Docker:
+
+```bash
+# Build a Docker image (first create a Dockerfile in the client directory if not present)
+docker build -t skillbridge-frontend .
+
+# Run the container
+docker run -p 3000:3000 skillbridge-frontend
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+Note: Make sure the backend is also running with Docker as described in the main README.
+
+#### Option 2: Local Development Setup
 
 1. Clone the repository and navigate to the client directory:
 
@@ -61,55 +122,49 @@ cd skill-bridge/client
 2. Install dependencies:
 
 ```bash
+# Install dependencies using npm
 npm install
-# or
+
+# Or, if you prefer yarn
 yarn install
-# or
+
+# Or, if you prefer pnpm
 pnpm install
 ```
 
-3. Configure the environment:
+3. Configure environment variables:
 
-Create a `.env.local` file in the root of the client directory with the following content:
+Create a `.env.local` file in the client directory with the following content:
 
 ```
-NEXT_PUBLIC_API_URL='http://localhost:8000'
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-This assumes your backend is running at http://localhost:8000. Adjust as needed.
+This assumes your backend is running at http://localhost:8000. Adjust if needed.
 
-4. Run the development server:
+4. Start the development server:
 
 ```bash
+# Start the development server
 npm run dev
-# or
+
+# Or, if using yarn
 yarn dev
-# or
+
+# Or, if using pnpm
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-### Build for Production
-
-To create an optimized production build:
+5. For a production build:
 
 ```bash
+# Create a production build
 npm run build
-# or
-yarn build
-# or
-pnpm build
-```
 
-Then you can start the production server:
-
-```bash
-npm run start
-# or
-yarn start
-# or
-pnpm start
+# Start the production server
+npm start
 ```
 
 ## Usage
@@ -122,6 +177,7 @@ The application provides a simple interface to:
 4. Submit for analysis
 
 The results will display:
+
 - An overall match score between your resume and the job description
 - A list of matched skills
 - A list of missing skills
@@ -172,3 +228,62 @@ The application supports both light and dark modes through a theme toggle in the
 - Tailwind CSS for styling
 - Shadcn UI for component library
 - TypeScript for type safety
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### Docker Issues
+
+1. **Docker container fails to start**:
+   ```
+   Error: Couldn't connect to Docker daemon
+   ```
+   - Make sure Docker Desktop is running
+   - Try running Docker Desktop as administrator/with sudo
+
+2. **Port already in use**:
+   ```
+   Error: Bind for 0.0.0.0:3000 failed: port is already allocated
+   ```
+   - Another application is using port 3000
+   - Change the port when running Docker: `docker run -p 3001:3000 skillbridge-frontend`
+   - Then access the application at http://localhost:3001
+
+3. **Container exits immediately**:
+   - Check logs with `docker logs [container_id]`
+   - Ensure your Dockerfile has the correct CMD command
+
+#### Node.js and npm Issues
+
+1. **Module not found errors**:
+   ```
+   Error: Cannot find module 'next'
+   ```
+   - Ensure dependencies are installed: `npm install`
+   - Delete node_modules folder and package-lock.json, then run `npm install` again
+
+2. **NVM not recognized**:
+   - Make sure NVM is installed and properly set up in your PATH
+   - Restart your terminal/command prompt after installation
+
+3. **Port conflicts with development server**:
+   - Change the port with: `npm run dev -- -p 3001`
+   - Or, for other package managers:
+     - Yarn: `yarn dev -p 3001`
+     - pnpm: `pnpm dev -p 3001`
+
+#### API Connection Issues
+
+1. **Cannot connect to backend API**:
+   - Ensure backend server is running
+   - Check your .env.local file has the correct NEXT_PUBLIC_API_URL value
+   - Verify network connectivity between frontend and backend
+
+### Getting Help
+
+If you encounter issues not covered here, check:
+1. The project's GitHub issues section
+2. Next.js documentation: https://nextjs.org/docs
+3. Docker documentation: https://docs.docker.com/
+4. Node.js documentation: https://nodejs.org/en/docs/

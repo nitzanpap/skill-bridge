@@ -26,6 +26,7 @@
 - **State Management**: React Context API
 - **API Integration**: Fetch API
 - **Build Tools**: Node.js 18+, npm/yarn/pnpm
+- **Containerization**: Docker for containerized deployment
 
 ### Backend
 - **Framework**: FastAPI (Python web framework)
@@ -36,6 +37,18 @@
 - **Language**: Python 3.10+
 - **Containerization**: Docker
 - **API Documentation**: Swagger UI / ReDoc (auto-generated)
+- **Dependency Management**: uv (faster and more reliable than pip)
+- **Development Tools**:
+  - Black for code formatting
+  - Flake8 for linting
+  - mypy for type checking
+
+### Development Environment
+- **Version Control**: Git
+- **Node Version Management**: nvm for managing Node.js versions
+- **Python Version Management**: pyenv (optional) for managing Python versions
+- **Environment Management**: Python virtual environments and .env files
+- **Container Orchestration**: Docker for consistent development and deployment environments
 
 ## Core Components
 
@@ -49,10 +62,89 @@
 
 ### Prerequisites
 
-- Python 3.10+
-- Node.js 18+
-- npm, yarn, or pnpm
-- Docker (optional, for containerized deployment)
+- Docker (for containerized deployment)
+- Node.js and npm (if running frontend locally)
+- Python 3.10+ (if running backend locally)
+
+#### Installing Docker
+
+Docker allows you to run applications in containers, making setup much easier:
+
+1. Download and install Docker Desktop from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+2. Follow the installation wizard instructions for your operating system
+3. After installation, start Docker Desktop
+4. Verify installation by running `docker --version` in your terminal/command prompt
+
+#### Installing Node.js using NVM (recommended)
+
+NVM (Node Version Manager) helps you manage multiple Node.js versions:
+
+**For macOS/Linux:**
+```bash
+# Install NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+# Reload your terminal profile
+source ~/.bashrc  # or ~/.zshrc if using zsh
+
+# Verify NVM installation
+nvm --version
+
+# Install Node.js 18
+nvm install 18
+
+# Use Node.js 18
+nvm use 18
+
+# Verify Node.js installation
+node --version
+npm --version
+```
+
+**For Windows:**
+1. Install NVM for Windows from [https://github.com/coreybutler/nvm-windows/releases](https://github.com/coreybutler/nvm-windows/releases)
+2. Download and run the nvm-setup.exe file
+3. Open a new Command Prompt and run:
+```cmd
+nvm install 18
+nvm use 18
+node --version
+npm --version
+```
+
+#### Installing Python (if running backend locally)
+
+**For macOS/Linux:**
+```bash
+# Install pyenv (Python version manager)
+curl https://pyenv.run | bash
+
+# Add to your shell profile
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+source ~/.bashrc  # or ~/.zshrc if using zsh
+
+# Install Python 3.10
+pyenv install 3.10
+
+# Set global Python version
+pyenv global 3.10
+
+# Verify installation
+python --version
+```
+
+**For Windows:**
+1. Download Python 3.10 installer from [python.org](https://www.python.org/downloads/)
+2. Run the installer and check "Add Python to PATH"
+3. Verify installation by opening Command Prompt and running `python --version`
+
+### Setup Options
+
+You can run the application using Docker (recommended) or run components locally.
+
+#### Option 1: Using Docker (Recommended)
 
 ### Backend
 
@@ -61,18 +153,7 @@
 git clone https://github.com/yourusername/skill-bridge.git
 cd skill-bridge
 
-# Setup environment and install dependencies
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-# Run the server
-python -m app.main
-```
-
-With Docker:
-```bash
+# Build and run the backend with Docker
 cd backend
 docker build -t skillbridge-backend .
 docker run -p 8000:8000 skillbridge-backend
@@ -80,30 +161,24 @@ docker run -p 8000:8000 skillbridge-backend
 
 The API will be available at http://localhost:8000 with documentation at http://localhost:8000/docs
 
+Note: The backend uses `uv` for Python dependency management.
+
 ### Frontend
 
 ```bash
 # Navigate to the client directory
 cd client
 
-# Install dependencies
-npm install
-# or: yarn install
-# or: pnpm install
-
-# Configure environment
-# Create a file named .env.local with:
-# NEXT_PUBLIC_API_URL='http://localhost:8000'
-
-# Run the development server
-npm run dev
-# or: yarn dev
-# or: pnpm dev
+# Build and run the frontend with Docker
+docker build -t skillbridge-frontend .
+docker run -p 3000:3000 skillbridge-frontend
 ```
 
 The application will be available at http://localhost:3000
 
-See the README files in the backend and client directories for more detailed setup instructions.
+#### Option 2: Running Locally
+
+See the README files in the backend and client directories for detailed instructions on running components locally.
 
 ## Usage
 

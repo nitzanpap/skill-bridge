@@ -14,7 +14,7 @@ A production-grade, containerized Python backend server that serves custom-train
 - **Documentation**: Auto-generated OpenAPI/Swagger
 - **Language**: Python 3.10+
 - **Containerization**: Docker with multi-stage builds
-- **Dependency Management**: pip with requirements.txt
+- **Dependency Management**: uv (fast Python package installer and resolver)
 - **Testing**: pytest for unit and integration tests
 - **Development Tools**:
   - Black for code formatting
@@ -23,22 +23,12 @@ A production-grade, containerized Python backend server that serves custom-train
 
 ## Quick Start
 
-Unix/Linux/Mac:
 ```bash
-# Setup and run without Docker
-./setup.sh && ./run.sh
+# Build the Docker image
+docker build -t skillbridge-backend .
 
-# OR with Docker
-docker build -t skillbridge-backend . && docker run -p 8000:8000 skillbridge-backend
-```
-
-Windows:
-```cmd
-# Setup and run without Docker
-setup.bat && run.bat
-
-# OR with Docker
-docker build -t skillbridge-backend . && docker run -p 8000:8000 skillbridge-backend
+# Run the Docker container
+docker run -p 8000:8000 skillbridge-backend
 ```
 
 Then access API at http://localhost:8000/docs
@@ -59,6 +49,7 @@ Then access API at http://localhost:8000/docs
 
 - Python 3.10+
 - Docker (optional, for containerized deployment)
+- uv (Python package installer and resolver)
 - 4GB+ RAM for running NLP models
 - 2GB+ disk space for models and dependencies
 
@@ -73,64 +64,67 @@ The main dependencies include:
 - Pydantic: Data validation
 - python-dotenv: Environment variable management
 
+Dependencies are managed using `uv` for improved performance and reliability.
+
 ## Setup
 
 ### Prerequisites
 
-Before installation, verify your Python version:
+- Docker (for containerized deployment)
+- Python 3.10+ (for local development)
+- uv (for dependency management)
 
+#### Installing Python
+
+**For macOS/Linux:**
 ```bash
-python --version  # Should be 3.10 or higher
+# Install pyenv (Python version manager)
+curl https://pyenv.run | bash
+
+# Add to your shell profile
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+source ~/.bashrc  # or ~/.zshrc if using zsh
+
+# Install Python 3.10
+pyenv install 3.10
+
+# Set global Python version
+pyenv global 3.10
+
+# Verify installation
+python --version
 ```
 
-### Local Development (Without Docker)
+**For Windows:**
+1. Download Python 3.10 installer from [python.org](https://www.python.org/downloads/)
+2. Run the installer and check "Add Python to PATH"
+3. Verify installation by opening Command Prompt and running `python --version`
 
-1. Clone the repository and navigate to the backend directory:
+#### Installing uv
 
+uv is a fast Python package installer and resolver. Here's how to install it:
+
+**For macOS/Linux:**
 ```bash
-git clone https://github.com/yourusername/skill-bridge.git
-cd skill-bridge/backend
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Verify installation
+uv --version
 ```
 
-2. Run the setup script which creates a virtual environment and installs dependencies:
-
-Unix/Linux/Mac:
-```bash
-./setup.sh
-```
-
-Windows:
+**For Windows:**
 ```cmd
-setup.bat
+# Using PowerShell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Verify installation
+uv --version
 ```
 
-Or manually:
-
-Unix/Linux/Mac:
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Windows:
-```cmd
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-3. Make sure your spaCy models are in the `models/` directory.
-
-4. Configure environment variables by creating a `.env` file:
-
-```
-MODELS_DIR=./models
-DEFAULT_MODEL=ner_model_20000
-ALLOWED_ORIGINS=*
-```
-
-### Docker Setup
+### Option 1: Docker Setup (Recommended)
 
 1. Build the Docker image:
 
@@ -150,34 +144,61 @@ For development with mounted volumes (to reflect code changes):
 docker run -p 8000:8000 -v $(pwd):/app skillbridge-backend
 ```
 
+### Option 2: Local Development Setup
+
+1. Clone the repository and navigate to the backend directory:
+
+```bash
+git clone https://github.com/yourusername/skill-bridge.git
+cd skill-bridge/backend
+```
+
+2. Create a virtual environment:
+
+```bash
+# Create a virtual environment
+python -m venv .venv
+
+# Activate the virtual environment
+# On macOS/Linux
+source .venv/bin/activate
+# On Windows
+.venv\Scripts\activate
+```
+
+3. Install dependencies using uv:
+
+```bash
+# Install dependencies
+uv pip install -r requirements.txt
+
+# Or, if you want to use the pyproject.toml
+uv pip install -e .
+```
+
+4. Configure environment variables by creating a `.env` file:
+
+```
+MODELS_DIR=./models
+DEFAULT_MODEL=ner_model_20000
+ALLOWED_ORIGINS=*
+```
+
+5. Start the development server:
+
+```bash
+# Run the backend server
+uvicorn app.main:app --reload
+```
+
+The API will be available at http://localhost:8000 with documentation at http://localhost:8000/docs
+
 ## Usage
 
-### Starting the Server
+The backend server is automatically started when the Docker container is run using the command:
 
-Run the server using the provided script:
-
-Unix/Linux/Mac:
 ```bash
-./run.sh
-```
-
-Windows:
-```cmd
-run.bat
-```
-
-Or manually:
-
-Unix/Linux/Mac:
-```bash
-source .venv/bin/activate
-python -m app.main
-```
-
-Windows:
-```cmd
-.venv\Scripts\activate
-python -m app.main
+docker run -p 8000:8000 skillbridge-backend
 ```
 
 ### Performance Considerations
@@ -346,6 +367,55 @@ Once the server is running, you can access the automatic API documentation at:
 
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### Docker Issues
+
+1. **Docker container fails to start**:
+   ```
+   Error: Couldn't connect to Docker daemon
+   ```
+   - Make sure Docker Desktop is running
+   - Try running Docker Desktop as administrator/with sudo
+
+2. **Port already in use**:
+   ```
+   Error: Bind for 0.0.0.0:8000 failed: port is already allocated
+   ```
+   - Another application is using port 8000
+   - Change the port when running Docker: `docker run -p 8001:8000 skillbridge-backend`
+   - Then access the API at http://localhost:8001/docs
+
+3. **Container exits immediately**:
+   - Check logs with `docker logs [container_id]`
+   - Ensure your Dockerfile has the correct CMD command
+
+#### Python Environment Issues
+
+1. **Python module not found**:
+   ```
+   ModuleNotFoundError: No module named 'fastapi'
+   ```
+   - Make sure you're in the activated virtual environment
+   - Reinstall dependencies: `uv pip install -r requirements.txt`
+
+2. **spaCy models not loading**:
+   - Ensure model files are in the correct directory
+   - Set the correct MODELS_DIR in your .env file
+
+3. **uv command not found**:
+   - Make sure uv is installed and in your PATH
+   - Install uv following the instructions in Prerequisites
+
+### Getting Help
+
+If you encounter issues not covered here, check:
+1. The project's GitHub issues section
+2. FastAPI documentation: https://fastapi.tiangolo.com/
+3. Docker documentation: https://docs.docker.com/
 
 ## Project Structure
 
