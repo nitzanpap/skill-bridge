@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import type React from "react";
+import type React from "react"
 
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea"
 
 interface TextInputProps {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  value: string
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
 export function TextInput({ value, onChange }: TextInputProps) {
@@ -20,5 +20,5 @@ export function TextInput({ value, onChange }: TextInputProps) {
         onChange={onChange}
       />
     </div>
-  );
+  )
 }
