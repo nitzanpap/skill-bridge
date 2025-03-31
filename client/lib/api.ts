@@ -6,8 +6,8 @@ const API_BASE_URL = isClient
   : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 const API_PREFIX = "/api/v1"
 
-// Default timeout for API requests (in milliseconds)
-const DEFAULT_TIMEOUT = 180000 // 3 minutes
+// Default timeout for API requests (in milliseconds) set to 6 minutes
+const DEFAULT_TIMEOUT = 360000
 
 // Log the API URL configuration
 console.log("API configuration:", {
