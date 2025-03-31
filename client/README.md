@@ -29,31 +29,19 @@ A modern web application for the SkillBridge platform. This client application p
   - ESLint for code quality
   - Prettier for code formatting
 - **Deployment**:
-  - Docker for containerization
   - Vercel/Netlify for production hosting (optional)
 
 ## Requirements
 
 - Node.js 18.x or later
 - npm 9.x or later (or equivalent yarn/pnpm)
-- Docker (for containerized deployment)
 - Modern browser with ES6+ support
 
 ## Quick Start
 
 ### Prerequisites
 
-- Docker (for containerized deployment)
 - Node.js 18+ and npm (for local development)
-
-#### Installing Docker
-
-Docker allows you to run applications in containers, making setup much easier:
-
-1. Download and install Docker Desktop from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
-2. Follow the installation wizard instructions for your operating system
-3. After installation, start Docker Desktop
-4. Verify installation by running `docker --version` in your terminal/command prompt
 
 #### Installing Node.js using NVM (recommended)
 
@@ -94,23 +82,7 @@ npm --version
 
 ### Setup Options
 
-#### Option 1: Docker Setup (Recommended)
-
-Build and run the client application using Docker:
-
-```bash
-# Build a Docker image (first create a Dockerfile in the client directory if not present)
-docker build -t skillbridge-frontend .
-
-# Run the container
-docker run -p 3000:3000 skillbridge-frontend
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
-Note: Make sure the backend is also running with Docker as described in the main README.
-
-#### Option 2: Local Development Setup
+#### Option 1: Local Development Setup
 
 1. Clone the repository and navigate to the client directory:
 
@@ -233,27 +205,6 @@ The application supports both light and dark modes through a theme toggle in the
 
 ### Common Issues and Solutions
 
-#### Docker Issues
-
-1. **Docker container fails to start**:
-   ```
-   Error: Couldn't connect to Docker daemon
-   ```
-   - Make sure Docker Desktop is running
-   - Try running Docker Desktop as administrator/with sudo
-
-2. **Port already in use**:
-   ```
-   Error: Bind for 0.0.0.0:3000 failed: port is already allocated
-   ```
-   - Another application is using port 3000
-   - Change the port when running Docker: `docker run -p 3001:3000 skillbridge-frontend`
-   - Then access the application at http://localhost:3001
-
-3. **Container exits immediately**:
-   - Check logs with `docker logs [container_id]`
-   - Ensure your Dockerfile has the correct CMD command
-
 #### Node.js and npm Issues
 
 1. **Module not found errors**:
@@ -285,5 +236,4 @@ The application supports both light and dark modes through a theme toggle in the
 If you encounter issues not covered here, check:
 1. The project's GitHub issues section
 2. Next.js documentation: https://nextjs.org/docs
-3. Docker documentation: https://docs.docker.com/
 4. Node.js documentation: https://nodejs.org/en/docs/
