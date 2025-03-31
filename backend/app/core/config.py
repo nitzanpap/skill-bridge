@@ -13,6 +13,7 @@ load_dotenv()
 # API settings
 API_V1_STR = "/api/v1"
 PROJECT_NAME = "SkillBridge"
+PORT = int(os.environ.get("PORT", 8000))
 
 # Path settings
 BASE_DIR = Path(__file__).resolve().parent.parent.parent

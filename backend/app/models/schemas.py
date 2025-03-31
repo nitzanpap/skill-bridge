@@ -55,6 +55,16 @@ class CourseRecommendationRequest(BaseModel):
         0.5, description="Similarity threshold for considering skills as a match"
     )
 
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "resume_text": "PROFESSIONAL SUMMARY\nExperienced software engineer with 7 years of experience developing web applications using React, TypeScript, and Node.js. Strong background in cloud architecture with AWS. Proven ability to design scalable solutions and mentor junior developers.\n\nSKILLS\nProgramming Languages: JavaScript, TypeScript, Python\nFrontend: React, Redux, HTML5, CSS3, SASS\nBackend: Node.js, Express, NestJS\nDatabases: MongoDB, PostgreSQL, MySQL\nCloud: AWS (EC2, S3, Lambda), Docker, Kubernetes\nTools: Git, JIRA, CI/CD pipelines\n\nEXPERIENCE\nSenior Software Engineer at TechCorp\nLed development of a customer-facing portal using React and TypeScript\nImplemented serverless architecture using AWS Lambda and API Gateway\nReduced page load time by 40% through code optimization\n",
+                "job_description_text": "We are looking for a Software Engineer with 5+ years of experience in React, Node.js, and TypeScript. The ideal candidate should have strong problem-solving skills and experience with AWS, Docker, and CI/CD pipelines. Knowledge of Python and machine learning frameworks like TensorFlow or PyTorch is a plus. Must be located in San Francisco or willing to relocate.",
+                "threshold": 0.5,
+            }
+        }
+    }
+
 
 class CourseRecommendationResponse(BaseModel):
     """Response schema for course recommendation results."""
