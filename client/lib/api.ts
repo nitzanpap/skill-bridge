@@ -7,7 +7,7 @@ const API_BASE_URL = isClient
 const API_PREFIX = "/api/v1"
 
 // Default timeout for API requests (in milliseconds)
-const DEFAULT_TIMEOUT = 60000 // 60 seconds
+const DEFAULT_TIMEOUT = 180000 // 3 minutes
 
 // Log the API URL configuration
 console.log("API configuration:", {
