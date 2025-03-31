@@ -26,7 +26,7 @@
 - **State Management**: React Context API
 - **API Integration**: Fetch API
 - **Build Tools**: Node.js 18+, npm/yarn/pnpm
-- **Containerization**: Docker for containerized deployment
+- **Deployment**: Vercel
 
 ### Backend
 - **Framework**: FastAPI (Python web framework)
@@ -168,14 +168,14 @@ You can run the application using Docker (recommended) or run components locally
 
 #### Option 1: Using Docker (Recommended)
 
-### Backend
-
+1. Clone the repository (if not done already)
 ```bash
-# Clone the repository (if not done already)
 git clone https://github.com/yourusername/skill-bridge.git
 cd skill-bridge
+```
 
-# Build and run the backend with Docker
+2. Build and run the backend with Docker
+```bash
 cd backend
 docker build -t skillbridge-backend .
 docker run -p 8000:8000 skillbridge-backend
@@ -185,15 +185,14 @@ The API will be available at http://localhost:8000 with documentation at http://
 
 Note: The backend uses `uv` for Python dependency management.
 
-### Frontend
-
+3. Build and run the frontend with npm
 ```bash
 # Navigate to the client directory
 cd client
 
-# Build and run the frontend with Docker
-docker build -t skillbridge-frontend .
-docker run -p 3000:3000 skillbridge-frontend
+# Build and run the frontend with npm
+npm install
+npm run dev
 ```
 
 The application will be available at http://localhost:3000
