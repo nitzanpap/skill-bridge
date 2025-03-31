@@ -3,18 +3,18 @@ version: '3.8'
 services:
   backend:
     build: ./backend
-    container_name: skillbridge-backend
+    container_name: skill-bridge-backend
     ports:
       - "8000:8000"
     networks:
-      - skillbridge-network
+      - skill-bridge-network
 
   frontend:
     build:
       context: ./client
       args:
         - NEXT_PUBLIC_API_URL=http://backend:8000
-    container_name: skillbridge-frontend
+    container_name: skill-bridge-frontend
     ports:
       - "3000:3000"
     environment:
@@ -23,8 +23,8 @@ services:
     depends_on:
       - backend
     networks:
-      - skillbridge-network
+      - skill-bridge-network
 
 networks:
-  skillbridge-network:
+  skill-bridge-network:
     driver: bridge

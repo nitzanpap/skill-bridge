@@ -29,8 +29,8 @@ cd .. # Go to project root
 docker-compose up -d
 
 # Or to build and run just the backend
-docker build -t skillbridge-backend .
-docker run -p 8000:8000 skillbridge-backend
+docker build -t skill-bridge-backend .
+docker run -p 8000:8000 skill-bridge-backend
 ```
 
 Then access API at http://localhost:8000/docs
@@ -69,19 +69,19 @@ All other dependencies are handled automatically by the Docker container.
 1. Build the Docker image:
 
 ```bash
-docker build -t skillbridge-backend .
+docker build -t skill-bridge-backend .
 ```
 
 2. Run the Docker container:
 
 ```bash
-docker run -p 8000:8000 skillbridge-backend
+docker run -p 8000:8000 skill-bridge-backend
 ```
 
 For development with mounted volumes (to reflect code changes):
 
 ```bash
-docker run -p 8000:8000 -v $(pwd):/app skillbridge-backend
+docker run -p 8000:8000 -v $(pwd):/app skill-bridge-backend
 ```
 
 ## Usage
@@ -89,7 +89,7 @@ docker run -p 8000:8000 -v $(pwd):/app skillbridge-backend
 The backend server is automatically started when the Docker container is run using the command:
 
 ```bash
-docker run -p 8000:8000 skillbridge-backend
+docker run -p 8000:8000 skill-bridge-backend
 ```
 
 ### Performance Considerations
@@ -277,7 +277,7 @@ Once the server is running, you can access the automatic API documentation at:
    Error: Bind for 0.0.0.0:8000 failed: port is already allocated
    ```
    - Another application is using port 8000
-   - Change the port when running Docker: `docker run -p 8001:8000 skillbridge-backend`
+   - Change the port when running Docker: `docker run -p 8001:8000 skill-bridge-backend`
    - Then access the API at http://localhost:8001/docs
 
 3. **Container exits immediately**:
