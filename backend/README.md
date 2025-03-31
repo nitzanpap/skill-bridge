@@ -24,10 +24,12 @@ A production-grade, containerized Python backend server that serves custom-train
 ## Quick Start
 
 ```bash
-# Build the Docker image
-docker build -t skillbridge-backend .
+# Using Docker Compose (recommended)
+cd .. # Go to project root
+docker-compose up -d
 
-# Run the Docker container
+# Or to build and run just the backend
+docker build -t skillbridge-backend .
 docker run -p 8000:8000 skillbridge-backend
 ```
 
@@ -47,110 +49,22 @@ Then access API at http://localhost:8000/docs
 
 ## Requirements
 
-- Python 3.10+
-- Docker (optional, for containerized deployment)
-- uv (Python package installer and resolver)
+- Docker
 - 4GB+ RAM for running NLP models
 - 2GB+ disk space for models and dependencies
 
-### Python Dependencies
-
-The main dependencies include:
-- FastAPI: Web framework
-- Uvicorn: ASGI server
-- spaCy: NLP framework
-- sentence-transformers: Embeddings for semantic search
-- scikit-learn: Machine learning utilities
-- Pydantic: Data validation
-- python-dotenv: Environment variable management
-
-Dependencies are managed using `uv` for improved performance and reliability.
+All other dependencies are handled automatically by the Docker container.
 
 ## Setup
 
 ### Prerequisites
 
-- Docker (for containerized deployment)
-- Python 3.10+ (for local development)
-- uv (for dependency management)
-- **Supported Platforms**: Linux or Windows with WSL (Windows Subsystem for Linux)
+- Docker (required for deployment)
+- **Supported Platforms**: Any platform that can run Docker
 
-> **Important**: The backend server is designed to run on Linux-based systems. If you're using Windows, you must use Windows Subsystem for Linux (WSL) to run the backend. Some of the NLP libraries and dependencies may not work correctly on native Windows.
+> **Important**: The backend server is designed to run exclusively through Docker. This ensures consistent environments across development and production.
 
-#### Installing WSL (for Windows users)
-
-If you're on Windows, follow these steps to set up WSL:
-
-1. Open PowerShell as Administrator and run:
-   ```powershell
-   wsl --install
-   ```
-   This installs Ubuntu by default.
-
-2. Restart your computer when prompted.
-
-3. After restart, a terminal will open automatically. Create your Linux username and password.
-
-4. Update your Linux distribution:
-   ```bash
-   sudo apt update && sudo apt upgrade -y
-   ```
-
-5. You can now access your WSL environment anytime by typing `wsl` in the command prompt or using the Windows Terminal.
-
-6. For Docker integration with WSL, make sure to enable the WSL integration in Docker Desktop settings.
-
-#### Installing Python
-
-**For macOS/Linux:**
-```bash
-# Install pyenv (Python version manager)
-curl https://pyenv.run | bash
-
-# Add to your shell profile
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-source ~/.bashrc  # or ~/.zshrc if using zsh
-
-# Install Python 3.10
-pyenv install 3.10
-
-# Set global Python version
-pyenv global 3.10
-
-# Verify installation
-python --version
-```
-
-**For Windows:**
-1. Download Python 3.10 installer from [python.org](https://www.python.org/downloads/)
-2. Run the installer and check "Add Python to PATH"
-3. Verify installation by opening Command Prompt and running `python --version`
-
-#### Installing uv
-
-uv is a fast Python package installer and resolver. Here's how to install it:
-
-**For macOS/Linux:**
-```bash
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Verify installation
-uv --version
-```
-
-**For Windows:**
-```cmd
-# Using PowerShell
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# Verify installation
-uv --version
-```
-
-### Option 1: Docker Setup (Recommended)
+### Docker Setup (Only Supported Method)
 
 1. Build the Docker image:
 
@@ -169,55 +83,6 @@ For development with mounted volumes (to reflect code changes):
 ```bash
 docker run -p 8000:8000 -v $(pwd):/app skillbridge-backend
 ```
-
-### Option 2: Local Development Setup
-
-1. Clone the repository and navigate to the backend directory:
-
-```bash
-git clone https://github.com/yourusername/skill-bridge.git
-cd skill-bridge/backend
-```
-
-2. Create a virtual environment:
-
-```bash
-# Create a virtual environment
-python -m venv .venv
-
-# Activate the virtual environment
-# On macOS/Linux
-source .venv/bin/activate
-# On Windows
-.venv\Scripts\activate
-```
-
-3. Install dependencies using uv:
-
-```bash
-# Install dependencies
-uv pip install -r requirements.txt
-
-# Or, if you want to use the pyproject.toml
-uv pip install -e .
-```
-
-4. Configure environment variables by creating a `.env` file:
-
-```
-MODELS_DIR=./models
-DEFAULT_MODEL=ner_model_20000
-ALLOWED_ORIGINS=*
-```
-
-5. Start the development server:
-
-```bash
-# Run the backend server
-uvicorn app.main:app --reload
-```
-
-The API will be available at http://localhost:8000 with documentation at http://localhost:8000/docs
 
 ## Usage
 

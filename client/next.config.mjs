@@ -23,8 +23,15 @@ const nextConfig = {
   },
   // Add async rewrites to proxy API requests in development
   async rewrites() {
-    // Default to localhost:8000 if NEXT_PUBLIC_API_URL is not defined
+    // Use the API URL from environment variable, with fallback
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    console.log("API URL used for rewrites:", apiUrl);
+    
+    // Log both client and server side environment
+    console.log("Environment:", {
+      NODE_ENV: process.env.NODE_ENV,
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    });
 
     return [
       {

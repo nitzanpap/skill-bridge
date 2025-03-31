@@ -33,111 +33,60 @@ A modern web application for the SkillBridge platform. This client application p
 
 ## Requirements
 
-- Node.js 18.x or later
-- npm 9.x or later (or equivalent yarn/pnpm)
+- Docker
 - Modern browser with ES6+ support
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm (for local development)
+- Docker (required for deployment)
+- **Supported Platforms**: Any platform that can run Docker
 
-#### Installing Node.js using NVM (recommended)
+> **Note**: The application is designed to run exclusively through Docker to ensure consistent environments across development and production.
 
-NVM (Node Version Manager) helps you manage multiple Node.js versions:
+#### Installing Docker
 
-**For macOS/Linux:**
-```bash
-# Install NVM
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+Docker allows you to run applications in containers, making setup much easier:
 
-# Reload your terminal profile
-source ~/.bashrc  # or ~/.zshrc if using zsh
+1. Download and install Docker Desktop from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+2. Follow the installation wizard instructions for your operating system
+3. After installation, start Docker Desktop
+4. Verify installation by running `docker --version` in your terminal/command prompt
 
-# Verify NVM installation
-nvm --version
-
-# Install Node.js 18
-nvm install 18
-
-# Use Node.js 18
-nvm use 18
-
-# Verify Node.js installation
-node --version
-npm --version
-```
-
-**For Windows:**
-1. Install NVM for Windows from [https://github.com/coreybutler/nvm-windows/releases](https://github.com/coreybutler/nvm-windows/releases)
-2. Download and run the nvm-setup.exe file
-3. Open a new Command Prompt and run:
-```cmd
-nvm install 18
-nvm use 18
-node --version
-npm --version
-```
-
-### Setup Options
-
-#### Option 1: Local Development Setup
+### Docker Setup (Only Supported Method)
 
 1. Clone the repository and navigate to the client directory:
 
 ```bash
 git clone https://github.com/yourusername/skill-bridge.git
-cd skill-bridge/client
+cd skill-bridge
 ```
 
-2. Install dependencies:
+2. Using Docker Compose (recommended):
 
 ```bash
-# Install dependencies using npm
-npm install
+# Build and start both frontend and backend
+docker-compose up -d
 
-# Or, if you prefer yarn
-yarn install
-
-# Or, if you prefer pnpm
-pnpm install
+# To rebuild containers after making changes
+docker-compose up -d --build
 ```
 
-3. Configure environment variables:
+The application will be available at http://localhost:3000
 
-Create a `.env.local` file in the client directory with the following content:
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
-This assumes your backend is running at http://localhost:8000. Adjust if needed.
-
-4. Start the development server:
+3. Or to build and run just the frontend:
 
 ```bash
-# Start the development server
-npm run dev
+# Build the Docker image
+cd client
+docker build -t skillbridge-frontend .
 
-# Or, if using yarn
-yarn dev
-
-# Or, if using pnpm
-pnpm dev
+# Run the Docker container
+docker run -p 3000:3000 -e NEXT_PUBLIC_API_URL=http://host.docker.internal:8000 skillbridge-frontend
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
-5. For a production build:
-
-```bash
-# Create a production build
-npm run build
-
-# Start the production server
-npm start
-```
+Note: When running just the frontend container, you'll need to ensure the backend is accessible and add the `--add-host=host.docker.internal:host-gateway` flag on Linux.
 
 ## Usage
 

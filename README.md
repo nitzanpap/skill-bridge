@@ -62,31 +62,10 @@
 
 ### Prerequisites
 
-- Docker (for containerized deployment)
-- Node.js and npm (if running frontend locally)
-- Python 3.10+ (if running backend locally)
-- **Supported Platforms**: Linux or Windows with WSL (Windows Subsystem for Linux)
+- Docker (required for deployment)
+- **Supported Platforms**: Any platform that can run Docker
 
-> **Note for Windows Users**: The backend server is designed to run on Linux-based systems. If you're using Windows, we recommend using Windows Subsystem for Linux (WSL) to run the backend. The frontend can run directly on Windows.
-
-#### Installing WSL (for Windows users)
-
-1. Open PowerShell as Administrator and run:
-   ```powershell
-   wsl --install
-   ```
-   This installs Ubuntu by default.
-
-2. Restart your computer when prompted.
-
-3. After restart, a terminal will open automatically. Create your Linux username and password.
-
-4. Update your Linux distribution:
-   ```bash
-   sudo apt update && sudo apt upgrade -y
-   ```
-
-5. You can now access your WSL environment anytime by typing `wsl` in the command prompt or using the Windows Terminal.
+> **Note**: The application is designed to run exclusively through Docker to ensure consistent environments across development and production.
 
 #### Installing Docker
 
@@ -97,76 +76,7 @@ Docker allows you to run applications in containers, making setup much easier:
 3. After installation, start Docker Desktop
 4. Verify installation by running `docker --version` in your terminal/command prompt
 
-#### Installing Node.js using NVM (recommended)
-
-NVM (Node Version Manager) helps you manage multiple Node.js versions:
-
-**For macOS/Linux:**
-```bash
-# Install NVM
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-
-# Reload your terminal profile
-source ~/.bashrc  # or ~/.zshrc if using zsh
-
-# Verify NVM installation
-nvm --version
-
-# Install Node.js 18
-nvm install 18
-
-# Use Node.js 18
-nvm use 18
-
-# Verify Node.js installation
-node --version
-npm --version
-```
-
-**For Windows:**
-1. Install NVM for Windows from [https://github.com/coreybutler/nvm-windows/releases](https://github.com/coreybutler/nvm-windows/releases)
-2. Download and run the nvm-setup.exe file
-3. Open a new Command Prompt and run:
-```cmd
-nvm install 18
-nvm use 18
-node --version
-npm --version
-```
-
-#### Installing Python (if running backend locally)
-
-**For macOS/Linux:**
-```bash
-# Install pyenv (Python version manager)
-curl https://pyenv.run | bash
-
-# Add to your shell profile
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-source ~/.bashrc  # or ~/.zshrc if using zsh
-
-# Install Python 3.10
-pyenv install 3.10
-
-# Set global Python version
-pyenv global 3.10
-
-# Verify installation
-python --version
-```
-
-**For Windows:**
-1. Download Python 3.10 installer from [python.org](https://www.python.org/downloads/)
-2. Run the installer and check "Add Python to PATH"
-3. Verify installation by opening Command Prompt and running `python --version`
-
-### Setup Options
-
-You can run the application using Docker (recommended) or run components locally.
-
-#### Option 1: Using Docker (Recommended)
+### Docker Setup (Only Supported Method)
 
 1. Clone the repository (if not done already)
 ```bash
@@ -174,32 +84,17 @@ git clone https://github.com/yourusername/skill-bridge.git
 cd skill-bridge
 ```
 
-2. Build and run the backend with Docker
+2. Build and run with Docker Compose
 ```bash
-cd backend
-docker build -t skillbridge-backend .
-docker run -p 8000:8000 skillbridge-backend
+# Build and start both backend and frontend services
+docker-compose up -d
+
+# To rebuild containers after making changes
+docker-compose up -d --build
 ```
 
 The API will be available at http://localhost:8000 with documentation at http://localhost:8000/docs
-
-Note: The backend uses `uv` for Python dependency management.
-
-3. Build and run the frontend with npm
-```bash
-# Navigate to the client directory
-cd client
-
-# Build and run the frontend with npm
-npm install
-npm run dev
-```
-
-The application will be available at http://localhost:3000
-
-#### Option 2: Running Locally
-
-See the README files in the backend and client directories for detailed instructions on running components locally.
+The frontend application will be available at http://localhost:3000
 
 ## Usage
 
