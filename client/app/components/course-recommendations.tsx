@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ExternalLink, Star, ArrowUp, TrendingUp } from "lucide-react"
-import { SkillBridgeResponse } from "@/lib/api"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Star, ArrowUp, TrendingUp } from "lucide-react";
+import { SkillBridgeResponse } from "@/lib/api";
 
 interface CourseRecommendationsDisplayProps {
-  recommendations: SkillBridgeResponse
+  recommendations: SkillBridgeResponse;
 }
 
 export function CourseRecommendationsDisplay({
   recommendations,
 }: CourseRecommendationsDisplayProps) {
-  const { recommended_courses, skill_gap } = recommendations
+  const { recommended_courses, skill_gap } = recommendations;
 
   // Find the course with the highest potential score
   const maxPotentialScore = Math.max(
-    ...recommended_courses.map((course) => course.potential_score || 0)
-  )
+    ...recommended_courses.map((course) => course.potential_score || 0),
+  );
 
   return (
     <div className="grid gap-6">
@@ -48,7 +48,9 @@ export function CourseRecommendationsDisplay({
                   </Badge>
                 ))}
                 {skill_gap.length === 0 && (
-                  <p className="text-sm text-muted-foreground">No skill gaps identified</p>
+                  <p className="text-sm text-muted-foreground">
+                    No skill gaps identified
+                  </p>
                 )}
               </div>
             </div>
@@ -57,9 +59,12 @@ export function CourseRecommendationsDisplay({
             <div className="space-y-4">
               {recommended_courses.map((course, index) => {
                 const isHighestScore =
-                  course.potential_score === maxPotentialScore && course.score_improvement > 0
-                const potentialScoreValue = course.potential_score?.toFixed(1) || "0.0"
-                const scoreImprovement = course.score_improvement?.toFixed(1) || "0.0"
+                  course.potential_score === maxPotentialScore &&
+                  course.score_improvement > 0;
+                const potentialScoreValue =
+                  course.potential_score?.toFixed(1) || "0.0";
+                const scoreImprovement =
+                  course.score_improvement?.toFixed(1) || "0.0";
 
                 return (
                   <div
@@ -80,7 +85,9 @@ export function CourseRecommendationsDisplay({
                       <div>
                         <h3
                           className={`font-semibold ${
-                            isHighestScore ? "text-green-700 dark:text-green-300" : ""
+                            isHighestScore
+                              ? "text-green-700 dark:text-green-300"
+                              : ""
                           }`}
                         >
                           {index + 1}. {course.course_name}
@@ -126,7 +133,9 @@ export function CourseRecommendationsDisplay({
                             </>
                           )}
                           {isHighestScore && (
-                            <Badge className="bg-green-500 text-white font-bold">Best Match</Badge>
+                            <Badge className="bg-green-500 text-white font-bold">
+                              Best Match
+                            </Badge>
                           )}
                         </div>
                       </div>
@@ -150,7 +159,7 @@ export function CourseRecommendationsDisplay({
                       </p>
                     )}
                   </div>
-                )
+                );
               })}
 
               {recommended_courses.length === 0 && (
@@ -170,8 +179,8 @@ export function CourseRecommendationsDisplay({
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            Here are some additional platforms where you can find courses to help bridge your skill
-            gap:
+            Here are some additional platforms where you can find courses to
+            help bridge your skill gap:
           </p>
           <div className="flex flex-wrap gap-2">
             <Button
@@ -194,7 +203,9 @@ export function CourseRecommendationsDisplay({
               variant="outline"
               size="sm"
               className="h-8"
-              onClick={() => window.open("https://www.pluralsight.com", "_blank")}
+              onClick={() =>
+                window.open("https://www.pluralsight.com", "_blank")
+              }
             >
               Pluralsight
             </Button>
@@ -210,7 +221,9 @@ export function CourseRecommendationsDisplay({
               variant="outline"
               size="sm"
               className="h-8"
-              onClick={() => window.open("https://www.linkedin.com/learning", "_blank")}
+              onClick={() =>
+                window.open("https://www.linkedin.com/learning", "_blank")
+              }
             >
               LinkedIn Learning
             </Button>
@@ -218,5 +231,5 @@ export function CourseRecommendationsDisplay({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

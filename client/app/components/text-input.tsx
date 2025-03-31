@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
 
 interface SingleTextInputProps {
-  value: string
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  label?: string
-  placeholder?: string
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  label?: string;
+  placeholder?: string;
 }
 
 export function TextInput({
@@ -27,14 +27,14 @@ export function TextInput({
         onChange={onChange}
       />
     </div>
-  )
+  );
 }
 
 interface DualTextInputProps {
-  resumeText: string
-  onResumeChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  jobDescriptionText: string
-  onJobDescriptionChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  resumeText: string;
+  onResumeChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  jobDescriptionText: string;
+  onJobDescriptionChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 export function DualTextInput({
@@ -58,5 +58,5 @@ export function DualTextInput({
         placeholder="Enter the job description text here..."
       />
     </div>
-  )
+  );
 }

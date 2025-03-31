@@ -157,13 +157,16 @@ The application supports both light and dark modes through a theme toggle in the
 #### Node.js and npm Issues
 
 1. **Module not found errors**:
+
    ```
    Error: Cannot find module 'next'
    ```
+
    - Ensure dependencies are installed: `npm install`
    - Delete node_modules folder and package-lock.json, then run `npm install` again
 
 2. **NVM not recognized**:
+
    - Make sure NVM is installed and properly set up in your PATH
    - Restart your terminal/command prompt after installation
 
@@ -183,6 +186,7 @@ The application supports both light and dark modes through a theme toggle in the
 ### Getting Help
 
 If you encounter issues not covered here, check:
+
 1. The project's GitHub issues section
 2. Next.js documentation: https://nextjs.org/docs
 3. Node.js documentation: https://nodejs.org/en/docs/

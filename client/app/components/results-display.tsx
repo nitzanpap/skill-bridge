@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface ResultsDisplayProps {
-  entities: Record<string, string[]>
-  entityTypes: Record<string, string>
+  entities: Record<string, string[]>;
+  entityTypes: Record<string, string>;
 }
 
 export function ResultsDisplay({ entities, entityTypes }: ResultsDisplayProps) {
@@ -36,5 +36,5 @@ export function ResultsDisplay({ entities, entityTypes }: ResultsDisplayProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

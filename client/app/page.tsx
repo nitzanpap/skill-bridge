@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useCallback, useEffect } from "react"
-import Image from "next/image"
+import { useState, useCallback, useEffect } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -9,21 +9,21 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "./components/theme-toggle"
-import { DualTextInput } from "./components/text-input"
-import { SkillComparisonDisplay } from "./components/comparison-results"
-import { CourseRecommendationsDisplay } from "./components/course-recommendations"
-import { Loader2 } from "lucide-react"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "./components/theme-toggle";
+import { DualTextInput } from "./components/text-input";
+import { SkillComparisonDisplay } from "./components/comparison-results";
+import { CourseRecommendationsDisplay } from "./components/course-recommendations";
+import { Loader2 } from "lucide-react";
 import {
   getSkillBridgeData,
   extractSkillComparisonData,
   SkillBridgeResponse,
   SkillComparisonData,
-} from "@/lib/api"
-import { toast } from "@/components/ui/use-toast"
-import { useTheme } from "next-themes"
+} from "@/lib/api";
+import { toast } from "@/components/ui/use-toast";
+import { useTheme } from "next-themes";
 
 // Sample texts for quick testing
 const sampleTexts = {
@@ -60,77 +60,84 @@ Machine Learning: Regression, Classification, Clustering
 `,
 
   "data-scientist-job": `Seeking a Data Scientist with expertise in Python, R, and SQL. Must have experience with data visualization tools like Tableau or Power BI, and machine learning libraries such as scikit-learn, TensorFlow, and PyTorch. Knowledge of big data technologies like Hadoop and Spark is required. The position is at DataTech in New York City.`,
-}
+};
 
 export default function Home() {
   // Resume and job description text states
-  const [resumeText, setResumeText] = useState("")
-  const [jobDescriptionText, setJobDescriptionText] = useState("")
-  const [threshold, setThreshold] = useState(0.5)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [processingStatus, setProcessingStatus] = useState<string>("")
-  const [skillData, setSkillData] = useState<SkillComparisonData | null>(null)
-  const [recommendationData, setRecommendationData] = useState<SkillBridgeResponse | null>(null)
+  const [resumeText, setResumeText] = useState("");
+  const [jobDescriptionText, setJobDescriptionText] = useState("");
+  const [threshold, setThreshold] = useState(0.5);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<string>("");
+  const [skillData, setSkillData] = useState<SkillComparisonData | null>(null);
+  const [recommendationData, setRecommendationData] =
+    useState<SkillBridgeResponse | null>(null);
   // Use a state variable for the logo with a fixed initial value
-  const [logoImage, setLogoImage] = useState("/logo-light.png")
-  const { theme } = useTheme()
+  const [logoImage, setLogoImage] = useState("/logo-light.png");
+  const { theme } = useTheme();
 
   // Update logo based on theme changes, but only on the client side
   useEffect(() => {
-    setLogoImage(theme === "dark" ? "/logo-dark.png" : "/logo-light.png")
-  }, [theme])
+    setLogoImage(theme === "dark" ? "/logo-dark.png" : "/logo-light.png");
+  }, [theme]);
 
   const handleSampleSelection = (sampleKey: string) => {
     if (sampleKey.includes("resume")) {
-      setResumeText(sampleTexts[sampleKey as keyof typeof sampleTexts])
+      setResumeText(sampleTexts[sampleKey as keyof typeof sampleTexts]);
     } else if (sampleKey.includes("job")) {
-      setJobDescriptionText(sampleTexts[sampleKey as keyof typeof sampleTexts])
+      setJobDescriptionText(sampleTexts[sampleKey as keyof typeof sampleTexts]);
     }
-  }
+  };
 
   const analyzeResume = useCallback(async () => {
     if (!resumeText.trim() || !jobDescriptionText.trim()) {
       toast({
         title: "Missing input",
         description: "Please provide both resume and job description texts.",
-      })
-      return
+      });
+      return;
     }
 
-    setIsProcessing(true)
-    setSkillData(null)
-    setRecommendationData(null)
-    setProcessingStatus("Analyzing resume and finding recommendations...")
+    setIsProcessing(true);
+    setSkillData(null);
+    setRecommendationData(null);
+    setProcessingStatus("Analyzing resume and finding recommendations...");
 
     try {
-      const apiStartTime = performance.now()
+      const apiStartTime = performance.now();
 
       // Call the unified API to get both skill comparison and course recommendations
-      const response = await getSkillBridgeData(resumeText, jobDescriptionText, threshold)
+      const response = await getSkillBridgeData(
+        resumeText,
+        jobDescriptionText,
+        threshold,
+      );
 
       // Extract the skill comparison data from the response
-      const skillComparisonData = extractSkillComparisonData(response)
+      const skillComparisonData = extractSkillComparisonData(response);
 
-      const apiEndTime = performance.now()
-      setProcessingStatus(`Analysis completed in ${Math.round(apiEndTime - apiStartTime)}ms.`)
+      const apiEndTime = performance.now();
+      setProcessingStatus(
+        `Analysis completed in ${Math.round(apiEndTime - apiStartTime)}ms.`,
+      );
 
       // Set both the skill comparison and recommendation data
-      setSkillData(skillComparisonData)
-      setRecommendationData(response)
-      setIsProcessing(false)
+      setSkillData(skillComparisonData);
+      setRecommendationData(response);
+      setIsProcessing(false);
     } catch (error) {
-      console.error("Error analyzing resume:", error)
+      console.error("Error analyzing resume:", error);
 
       toast({
         title: "Analysis Failed",
         description:
           "We couldn't analyze your resume against the job requirements. Please try again later.",
         variant: "destructive",
-      })
+      });
 
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }, [resumeText, jobDescriptionText, threshold])
+  }, [resumeText, jobDescriptionText, threshold]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,8 +165,9 @@ export default function Home() {
             <CardHeader>
               <CardTitle>Resume Analysis</CardTitle>
               <CardDescription>
-                Compare your resume against a job description to identify matching skills, missing
-                skills, and get personalized course recommendations
+                Compare your resume against a job description to identify
+                matching skills, missing skills, and get personalized course
+                recommendations
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -168,7 +176,9 @@ export default function Home() {
                   resumeText={resumeText}
                   onResumeChange={(e) => setResumeText(e.target.value)}
                   jobDescriptionText={jobDescriptionText}
-                  onJobDescriptionChange={(e) => setJobDescriptionText(e.target.value)}
+                  onJobDescriptionChange={(e) =>
+                    setJobDescriptionText(e.target.value)
+                  }
                 />
 
                 <div className="grid gap-4">
@@ -199,28 +209,36 @@ export default function Home() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSampleSelection("software-engineer-resume")}
+                        onClick={() =>
+                          handleSampleSelection("software-engineer-resume")
+                        }
                       >
                         Software Engineer Resume
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSampleSelection("software-engineer-job")}
+                        onClick={() =>
+                          handleSampleSelection("software-engineer-job")
+                        }
                       >
                         Software Engineer Job
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSampleSelection("data-scientist-resume")}
+                        onClick={() =>
+                          handleSampleSelection("data-scientist-resume")
+                        }
                       >
                         Data Scientist Resume
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleSampleSelection("data-scientist-job")}
+                        onClick={() =>
+                          handleSampleSelection("data-scientist-job")
+                        }
                       >
                         Data Scientist Job
                       </Button>
@@ -232,7 +250,11 @@ export default function Home() {
             <CardFooter className="flex items-center justify-between">
               <Button
                 onClick={analyzeResume}
-                disabled={!resumeText.trim() || !jobDescriptionText.trim() || isProcessing}
+                disabled={
+                  !resumeText.trim() ||
+                  !jobDescriptionText.trim() ||
+                  isProcessing
+                }
                 className="w-full sm:w-auto"
               >
                 {isProcessing ? (
@@ -246,20 +268,26 @@ export default function Home() {
               </Button>
 
               {isProcessing && processingStatus && (
-                <p className="text-sm text-muted-foreground">{processingStatus}</p>
+                <p className="text-sm text-muted-foreground">
+                  {processingStatus}
+                </p>
               )}
             </CardFooter>
           </Card>
 
           {/* Display skill comparison results */}
-          {skillData && <SkillComparisonDisplay comparisonResults={skillData} />}
+          {skillData && (
+            <SkillComparisonDisplay comparisonResults={skillData} />
+          )}
 
           {/* Display course recommendations */}
           {recommendationData && (
-            <CourseRecommendationsDisplay recommendations={recommendationData} />
+            <CourseRecommendationsDisplay
+              recommendations={recommendationData}
+            />
           )}
         </div>
       </main>
     </div>
-  )
+  );
 }
