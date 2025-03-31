@@ -236,4 +236,4 @@ The application supports both light and dark modes through a theme toggle in the
 If you encounter issues not covered here, check:
 1. The project's GitHub issues section
 2. Next.js documentation: https://nextjs.org/docs
-4. Node.js documentation: https://nodejs.org/en/docs/
+3. Node.js documentation: https://nodejs.org/en/docs/
