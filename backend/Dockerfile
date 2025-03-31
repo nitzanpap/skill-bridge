@@ -21,7 +21,12 @@ COPY pyproject.toml .
 
 ENV PATH="/root/.local/bin/:$PATH"
 
-# Install dependencies
+# Install dependencies in a specific order to avoid binary compatibility issues
+# First install numpy with a compatible version
+RUN pip install numpy==1.24.3
+# Then install spacy with exact version
+RUN pip install spacy==3.7.2
+# Then install the rest of the dependencies
 RUN uv sync
 
 # Copy application code

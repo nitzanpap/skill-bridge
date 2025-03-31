@@ -8,8 +8,9 @@ dependencies = [
     "cohere>=5.14.0",
     "dotenv>=0.9.9",
     "fastapi>=0.115.12",
+    "numpy==1.24.3",
     "pinecone>=6.0.2",
     "sentence-transformers>=4.0.1",
-    "spacy>=3.8.4",
+    "spacy==3.7.2",
     "uvicorn>=0.34.0",
 ]
