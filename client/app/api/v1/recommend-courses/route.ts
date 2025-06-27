@@ -1,3 +1,4 @@
+import { appConfig } from '@/configs/config'
 import { NextRequest, NextResponse } from 'next/server'
 
 // This API route proxies requests to the backend with proper timeout handling
@@ -5,16 +6,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Get the backend URL from environment
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
     // Create abort controller for manual timeout
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 360000) // 6 minutes
 
     try {
       // Create the request to the backend
-      const backendResponse = await fetch(`${backendUrl}/api/v1/recommend-courses`, {
+      const backendResponse = await fetch(`${appConfig.backendUrl}/api/v1/recommend-courses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

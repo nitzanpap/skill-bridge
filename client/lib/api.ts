@@ -1,23 +1,26 @@
 // API base URL - use relative URL when in browser environment
+
+import { appConfig } from '@/configs/config'
+import { NodeEnvs } from '@/types/config'
+
 // to leverage Next.js rewrites and avoid CORS issues
 const isClient = typeof window !== 'undefined'
 const API_BASE_URL = isClient
   ? '' // Always use relative URLs on client side to leverage Next.js rewrites
-  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+  : appConfig.backendUrl || 'http://localhost:8000'
 const API_PREFIX = '/api/v1'
-
-const NODE_ENV = process.env.NODE_ENV
 
 // Default timeout for API requests (in milliseconds) set to 6 minutes
 const DEFAULT_TIMEOUT = 360000
 
-if (NODE_ENV !== 'production') {
+if (appConfig.nodeEnv !== NodeEnvs.PRODUCTION) {
   // Log the API URL configuration
   console.log('API configuration:', {
     isClient,
     API_BASE_URL,
     API_PREFIX,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NODE_ENV: process.env.NODE_ENV,
   })
 }
 

@@ -1,17 +1,15 @@
+import { appConfig } from '@/configs/config'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    // Get the backend URL from environment
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
     // Create abort controller for manual timeout
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
 
     try {
       // Test connectivity to the backend
-      const backendResponse = await fetch(`${backendUrl}/healthz`, {
+      const backendResponse = await fetch(`${appConfig.backendUrl}/healthz`, {
         method: 'GET',
         signal: controller.signal,
       })
@@ -23,7 +21,7 @@ export async function GET() {
       return NextResponse.json({
         status: 'ok',
         backend: 'connected',
-        backendUrl: backendUrl,
+        backendUrl: appConfig.backendUrl,
       })
     } finally {
       clearTimeout(timeoutId)
