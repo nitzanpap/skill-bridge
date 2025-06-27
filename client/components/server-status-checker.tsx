@@ -23,7 +23,6 @@ export function ServerStatusChecker() {
 
         // Update or dismiss the initial toast
         toast({
-          id: initialToastId,
           title: isReady ? "Server ready!" : "Server issue",
           description: isReady
             ? "The server is up and running"
@@ -33,7 +32,6 @@ export function ServerStatusChecker() {
       } catch (error) {
         // Server check failed entirely
         toast({
-          id: initialToastId,
           title: "Server connection failed",
           description: "Could not connect to the server. Please try refreshing the page.",
           variant: "destructive",

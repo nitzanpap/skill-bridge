@@ -72,12 +72,27 @@ export default function Home() {
   const [skillData, setSkillData] = useState<SkillComparisonData | null>(null)
   const [recommendationData, setRecommendationData] = useState<SkillBridgeResponse | null>(null)
   // Use a state variable for the logo with a fixed initial value
-  const [logoImage, setLogoImage] = useState("/logo-light.png")
+  const [logoImage, setLogoImage] = useState<string | undefined>(undefined)
   const { theme } = useTheme()
 
   // Update logo based on theme changes, but only on the client side
   useEffect(() => {
-    setLogoImage(theme === "dark" ? "/logo-dark.png" : "/logo-light.png")
+    switch (theme) {
+      case "dark":
+        setLogoImage("/logo-dark.png")
+        return
+      case "light":
+        setLogoImage("/logo-light.png")
+        return
+      case "system":
+        // Figure out the system theme
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+        setLogoImage(prefersDark ? "/logo-dark.png" : "/logo-light.png")
+        return
+      default:
+        setLogoImage("/logo-light.png")
+        return
+    }
   }, [theme])
 
   const handleSampleSelection = (sampleKey: string) => {
@@ -137,14 +152,15 @@ export default function Home() {
       <header className="border-b flex w-full bg-background shadow-sm">
         <div className="flex h-32 w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            {/* <h1 className="text-3xl font-bold">Skill Bridge</h1> */}
-            <Image
-              src={logoImage}
-              alt="Skill Bridge Logo"
-              width={220}
-              height={220}
-              className="ml-2"
-            />
+            {logoImage && (
+              <Image
+                src={logoImage}
+                alt="Skill Bridge Logo"
+                width={220}
+                height={220}
+                className="ml-2"
+              />
+            )}
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -173,7 +189,7 @@ export default function Home() {
 
                 <div className="grid gap-4">
                   {/* // TODO: Add threshold slider back in */}
-                  {/* <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2">
                     <label htmlFor="threshold" className="text-sm font-medium">
                       Similarity Threshold: {threshold}
                     </label>
@@ -191,7 +207,7 @@ export default function Home() {
                       Lower values match more skills with weaker similarities. Higher values require
                       stronger matches.
                     </p>
-                  </div> */}
+                  </div>
 
                   <div className="grid gap-2">
                     <h3 className="text-sm font-medium">Sample Texts</h3>
@@ -229,7 +245,7 @@ export default function Home() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex items-center justify-between">
+            <CardFooter className="flex items-center justify-between flex-wrap gap-2">
               <Button
                 onClick={analyzeResume}
                 disabled={!resumeText.trim() || !jobDescriptionText.trim() || isProcessing}
