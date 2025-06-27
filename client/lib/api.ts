@@ -13,19 +13,122 @@ const API_PREFIX = '/api/v1'
 // Default timeout for API requests (in milliseconds) set to 6 minutes
 const DEFAULT_TIMEOUT = 360000
 
-if (appConfig.nodeEnv !== NodeEnvs.PRODUCTION) {
-  // Log the API URL configuration
-  console.log('API configuration:', {
+if (appConfig.nodeEnv === NodeEnvs.LOCAL) {
+  // Only log detailed API configuration in local development
+  console.log('🔧 API configuration:', {
     isClient,
-    API_BASE_URL,
-    API_PREFIX,
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-    NODE_ENV: process.env.NODE_ENV,
+    primaryBackend: process.env.NEXT_PUBLIC_API_URL,
+    backupBackend: process.env.NEXT_PUBLIC_BACKUP_API_URL,
+    environment: process.env.NODE_ENV,
   })
 }
 
 /**
- * Creates a fetch request with a timeout
+ * Attempts to fetch from primary backend, falls back to backup if primary fails
+ * @param endpoint - The API endpoint to call
+ * @param options - Fetch options
+ * @param timeout - Timeout in milliseconds
+ * @returns Promise with the fetch response
+ */
+const fetchWithFallback = async (
+  endpoint: string,
+  options: RequestInit = {},
+  timeout: number = DEFAULT_TIMEOUT,
+): Promise<Response> => {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+  try {
+    // Try primary backend first
+    let primaryUrl: string
+
+    if (isClient) {
+      // On client side, use the Next.js rewrite (which points to primary backend)
+      primaryUrl = endpoint
+    } else {
+      // On server side, use the full URL
+      primaryUrl = `${appConfig.backendUrl}${endpoint}`
+    }
+
+    try {
+      const response = await fetch(primaryUrl, {
+        ...options,
+        signal: controller.signal,
+      })
+
+      if (response.ok) {
+        return response
+      }
+
+      // If primary fails with a server error or 404, try backup
+      if (response.status >= 400) {
+        throw new Error(`Primary backend failed with status ${response.status}`)
+      }
+
+      return response
+    } catch (primaryError) {
+      // Try backup backend if available
+      if (appConfig.backupBackendUrl) {
+        console.warn('Primary backend failed, trying backup:', primaryError)
+
+        let backupUrl: string
+
+        if (isClient) {
+          // On client side, use Next.js backup rewrite to hide the actual backup URL
+          if (endpoint.startsWith('/api/')) {
+            // For API endpoints, use the backup-api route
+            backupUrl = endpoint.replace('/api/', '/backup-api/')
+          } else if (endpoint === '/healthz') {
+            // For health check, use the backup health route
+            backupUrl = '/backup-healthz'
+          } else if (endpoint === '/readyz') {
+            // For readiness check, use the backup readiness route
+            backupUrl = '/backup-readyz'
+          } else {
+            // For other endpoints, prepend backup- prefix
+            backupUrl = `/backup${endpoint}`
+          }
+        } else {
+          // On server side, use the full backup URL
+          backupUrl = `${appConfig.backupBackendUrl}${endpoint}`
+        }
+
+        try {
+          const backupResponse = await fetch(backupUrl, {
+            ...options,
+            signal: controller.signal,
+            headers: {
+              ...options.headers,
+              // Add ngrok header for backup requests too (in case backup is also ngrok)
+              ...(isClient && {
+                'ngrok-skip-browser-warning': 'true',
+              }),
+            },
+          })
+
+          if (backupResponse.ok) {
+            console.log('Successfully connected to backup backend via Next.js proxy')
+            return backupResponse
+          }
+
+          throw new Error(`Backup backend also failed with status ${backupResponse.status}`)
+        } catch (backupError) {
+          console.error('Backup backend also failed:', backupError)
+          // Throw the original error since both failed
+          throw primaryError
+        }
+      }
+
+      // If backup not available, throw the original error
+      throw primaryError
+    }
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+/**
+ * Creates a fetch request with a timeout (legacy function, use fetchWithFallback for new code)
  * @param url - The URL to fetch
  * @param options - Fetch options
  * @param timeout - Timeout in milliseconds (defaults to 60 seconds)
@@ -60,7 +163,7 @@ export interface Entity {
 // Check server readiness
 export const checkServerReadiness = async (): Promise<boolean> => {
   try {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/readyz`, {
+    const response = await fetchWithFallback('/healthz', {
       method: 'GET',
       headers: {
         'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning, if applicable
@@ -72,7 +175,7 @@ export const checkServerReadiness = async (): Promise<boolean> => {
     }
 
     const data = await response.json()
-    return data.status === 'ready'
+    return data.status === 'alive'
   } catch (error) {
     console.error('Server readiness check failed:', error)
     return false
@@ -117,7 +220,7 @@ export const getSkillBridgeData = async (
   threshold: number = 0.5,
 ): Promise<SkillBridgeResponse> => {
   try {
-    const response = await fetchWithTimeout(`${API_BASE_URL}${API_PREFIX}/recommend-courses`, {
+    const response = await fetchWithFallback(`${API_PREFIX}/recommend-courses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

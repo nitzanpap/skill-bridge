@@ -77,7 +77,7 @@ docker-compose up -d
 docker-compose up -d --build
 ```
 
-The application will be available at http://localhost:3000
+The application will be available at <http://localhost:3000>
 
 3. Or to build and run just the frontend:
 
@@ -136,6 +136,44 @@ client/
 ├── next.config.mjs         # Next.js configuration
 └── package.json            # Project dependencies
 ```
+
+## Configuration
+
+The application uses environment variables for configuration. Create a `.env.local` file in the
+client directory to set up your environment:
+
+```bash
+# Primary backend URL (required)
+NEXT_PUBLIC_API_URL=http://localhost:8000
+
+# Backup backend URL (optional)
+# Used as fallback if the primary backend fails
+NEXT_PUBLIC_BACKUP_API_URL=http://localhost:8001
+
+# Node environment
+NODE_ENV=development
+```
+
+### Environment Variables
+
+- **`NEXT_PUBLIC_API_URL`**: The primary backend API URL. This is the main endpoint the client will
+  try to connect to.
+- **`NEXT_PUBLIC_BACKUP_API_URL`**: The backup backend API URL. If the primary backend fails or
+  returns a server error (5xx), the client will automatically attempt to use this backup URL.
+- **`NODE_ENV`**: The Node.js environment (development, production, local).
+
+### Fallback Mechanism
+
+The client includes an automatic fallback mechanism that:
+
+1. First attempts to connect to the primary backend via Next.js rewrites (keeping URLs hidden)
+2. If the primary backend fails with a server error (500+) or is unreachable, automatically switches
+   to the backup backend via Next.js backup rewrites  
+3. All backend URLs remain hidden from the client - users only see your Next.js domain
+4. Logs the fallback activity for monitoring and debugging purposes
+
+This ensures high availability and seamless user experience even if one backend instance goes down,
+while maintaining URL privacy through Next.js proxy routing.
 
 ## API Integration
 
@@ -196,5 +234,5 @@ Themes are implemented using CSS variables and persistent storage to remember us
 If you encounter issues not covered here, check:
 
 1. The project's GitHub issues section
-2. Next.js documentation: https://nextjs.org/docs
-3. Node.js documentation: https://nodejs.org/en/docs/
+2. Next.js documentation: <https://nextjs.org/docs>
+3. Node.js documentation: <https://nodejs.org/en/docs/>
