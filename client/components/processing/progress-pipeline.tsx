@@ -34,7 +34,7 @@ export function ProgressPipeline({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className='flex items-center justify-between overflow-x-auto pb-4'>
+      <div className='flex w-full items-center justify-between pb-4'>
         {STAGE_ORDER.map((stage, index) => {
           const isLast = index === STAGE_ORDER.length - 1
           const stageInfo = PROCESSING_STAGES[stage]
@@ -46,7 +46,7 @@ export function ProgressPipeline({
               {/* Stage */}
               <div
                 className={cn(
-                  'flex min-w-0 flex-col items-center',
+                  'flex min-w-0 flex-col items-center overflow-x-hidden',
                   isInteractive &&
                     onStageClick &&
                     'cursor-pointer transition-transform hover:scale-105',
