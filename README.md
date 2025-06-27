@@ -17,8 +17,9 @@
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 14+ (React framework)
-- **UI Libraries**: 
+- **UI Libraries**:
   - Tailwind CSS for styling
   - Shadcn UI for component library
   - Lucide React for icons
@@ -29,6 +30,7 @@
 - **Deployment**: Vercel
 
 ### Backend
+
 - **Framework**: FastAPI (Python web framework)
 - **Machine Learning**:
   - spaCy for NER models
@@ -44,6 +46,7 @@
   - mypy for type checking
 
 ### Development Environment
+
 - **Version Control**: Git
 - **Node Version Management**: nvm for managing Node.js versions
 - **Python Version Management**: pyenv (optional) for managing Python versions
@@ -79,22 +82,24 @@ Docker allows you to run applications in containers, making setup much easier:
 ### Docker Setup (Only Supported Method)
 
 1. Clone the repository (if not done already)
-```bash
-git clone https://github.com/yourusername/skill-bridge.git
-cd skill-bridge
-```
+
+    ```bash
+    git clone https://github.com/yourusername/skill-bridge.git
+    cd skill-bridge
+    ```
 
 2. Build and run with Docker Compose
-```bash
-# Build and start both backend and frontend services
-docker-compose up -d
 
-# To rebuild containers after making changes
-docker-compose up -d --build
-```
+    ```bash
+    # Build and start both backend and frontend services
+    docker-compose up -d
 
-The API will be available at http://localhost:8000 with documentation at http://localhost:8000/docs
-The frontend application will be available at http://localhost:3000
+    # To rebuild containers after making changes
+    docker-compose up -d --build
+    ```
+
+The API will be available at <http://localhost:8000> with documentation at <http://localhost:8000/docs>
+The frontend application will be available at <http://localhost:3000>
 
 ## Usage
 
@@ -106,7 +111,7 @@ The application provides a simple web interface where you can:
 4. Get a comprehensive analysis including:
    - Overall match score
    - Matched skills
-   - Missing skills 
+   - Missing skills
    - Detailed similarity breakdown for each skill
    - Course recommendations to bridge your skill gap
    - Score improvement predictions for each recommended course

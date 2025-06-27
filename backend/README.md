@@ -33,7 +33,7 @@ docker build -t skill-bridge-backend .
 docker run -p 8000:8000 skill-bridge-backend
 ```
 
-Then access API at http://localhost:8000/docs
+Then access API at <http://localhost:8000/docs>
 
 ## Features
 
@@ -68,29 +68,29 @@ All other dependencies are handled automatically by the Docker container.
 
 1. Build the Docker image:
 
-```bash
-docker build -t skill-bridge-backend .
-```
+    ```bash
+    docker build -t skill-bridge-backend .
+    ```
 
 2. Run the Docker container:
 
-```bash
-docker run -p 8000:8000 skill-bridge-backend
-```
+    ```bash
+    docker run -p 8000:8000 skill-bridge-backend
+    ```
 
 For development with mounted volumes (to reflect code changes):
 
-```bash
-docker run -p 8000:8000 -v $(pwd):/app skill-bridge-backend
-```
+  ```bash
+  docker run -p 8000:8000 -v $(pwd):/app skill-bridge-backend
+  ```
 
 ## Usage
 
 The backend server is automatically started when the Docker container is run using the command:
 
-```bash
-docker run -p 8000:8000 skill-bridge-backend
-```
+  ```bash
+  docker run -p 8000:8000 skill-bridge-backend
+  ```
 
 ### Performance Considerations
 
@@ -102,11 +102,12 @@ docker run -p 8000:8000 skill-bridge-backend
 
 #### Semantic Skill Comparison
 
-```
+```sh
 POST /api/v1/compare-skills/semantic
 ```
 
 Request:
+
 ```json
 {
   "resume_text": "Machine learning engineer with 5 years of Python experience",
@@ -116,6 +117,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "score": 85.5,
@@ -148,11 +150,12 @@ This endpoint extracts skills from both the resume and job description using NER
 
 #### Course Recommendations
 
-```
+```sh
 POST /api/v1/recommend-courses
 ```
 
 Request:
+
 ```json
 {
   "skill_gap": ["deep learning", "TensorFlow", "PyTorch"],
@@ -161,6 +164,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "recommended_courses": [
@@ -187,11 +191,12 @@ This endpoint takes a list of missing skills and the current job match score, th
 
 #### Analyze Text
 
-```
+```sh
 POST /api/v1/analyze
 ```
 
 Request:
+
 ```json
 {
   "text": "Senior ML Engineer with 5 years at Amazon",
@@ -200,6 +205,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "entities": [
@@ -212,11 +218,12 @@ Response:
 
 #### Analyze Text with All Models
 
-```
+```sh
 POST /api/v1/analyze/all
 ```
 
 Request:
+
 ```json
 {
   "text": "Senior ML Engineer with 5 years at Amazon"
@@ -224,6 +231,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "entities": [
@@ -237,11 +245,12 @@ Response:
 
 #### List Available Models
 
-```
+```sh
 GET /api/v1/models
 ```
 
 Response:
+
 ```json
 {
   "available_models": [
@@ -266,19 +275,23 @@ Once the server is running, you can access the automatic API documentation at:
 #### Docker Issues
 
 1. **Docker container fails to start**:
-   ```
+
+   ```error
    Error: Couldn't connect to Docker daemon
    ```
+
    - Make sure Docker Desktop is running
    - Try running Docker Desktop as administrator/with sudo
 
 2. **Port already in use**:
-   ```
+
+   ```error
    Error: Bind for 0.0.0.0:8000 failed: port is already allocated
    ```
+
    - Another application is using port 8000
    - Change the port when running Docker: `docker run -p 8001:8000 skill-bridge-backend`
-   - Then access the API at http://localhost:8001/docs
+   - Then access the API at <http://localhost:8001/docs>
 
 3. **Container exits immediately**:
    - Check logs with `docker logs [container_id]`
@@ -287,9 +300,11 @@ Once the server is running, you can access the automatic API documentation at:
 #### WSL Issues (Windows Users)
 
 1. **WSL not available or WSL 2 required**:
-   ```
+
+   ```error
    Error: WSL is not enabled on this machine
    ```
+
    - Enable WSL by running `dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart` in PowerShell as administrator
    - Enable Virtual Machine Platform with `dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`
    - Restart your computer
@@ -302,11 +317,13 @@ Once the server is running, you can access the automatic API documentation at:
 
 3. **Performance issues with WSL**:
    - Add memory limits to WSL by creating a `.wslconfig` file in your Windows user directory with:
-     ```
+
+     ```error
      [wsl2]
      memory=4GB
      processors=2
      ```
+
    - Restart WSL with `wsl --shutdown` then reopen
 
 4. **File permission issues**:
@@ -316,9 +333,11 @@ Once the server is running, you can access the automatic API documentation at:
 #### Python Environment Issues
 
 1. **Python module not found**:
-   ```
+
+   ```error
    ModuleNotFoundError: No module named 'fastapi'
    ```
+
    - Make sure you're in the activated virtual environment
    - Reinstall dependencies: `uv pip install -r requirements.txt`
 
@@ -333,13 +352,14 @@ Once the server is running, you can access the automatic API documentation at:
 ### Getting Help
 
 If you encounter issues not covered here, check:
+
 1. The project's GitHub issues section
-2. FastAPI documentation: https://fastapi.tiangolo.com/
-3. Docker documentation: https://docs.docker.com/
+2. FastAPI documentation: <https://fastapi.tiangolo.com/>
+3. Docker documentation: <https://docs.docker.com/>
 
 ## Project Structure
 
-```
+```sh
 backend/
 ├── app/
 │   ├── main.py              # App entrypoint
@@ -367,5 +387,5 @@ Configure the application by setting the following environment variables in the 
 
 - `MODELS_DIR`: Directory containing the spaCy models (default: `./models`)
 - `DEFAULT_MODEL`: Default model to use when none is specified (default: `ner_model_20000`)
-- `ALLOWED_ORIGINS`: CORS allowed origins (default: `*`) 
+- `ALLOWED_ORIGINS`: CORS allowed origins (default: `*`)
 - `COURSE_API_KEY`: API key for accessing course data (if applicable)

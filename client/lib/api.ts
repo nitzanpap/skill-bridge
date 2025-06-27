@@ -2,7 +2,7 @@
 // to leverage Next.js rewrites and avoid CORS issues
 const isClient = typeof window !== "undefined"
 const API_BASE_URL = isClient
-  ? process.env.NEXT_PUBLIC_API_URL || ""
+  ? "" // Always use relative URLs on client side to leverage Next.js rewrites
   : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 const API_PREFIX = "/api/v1"
 
