@@ -129,7 +129,7 @@ You can deploy the backend on any cloud provider that supports Docker build/comp
     npm install -g ngrok
 
     # Start ngrok to expose your local backend
-    ngrok http --url=monkey-holy-corgi.ngrok-free.app 8000
+    ngrok http 8000
     ```
 
 Whatever method you choose, ensure that the backend URL is correctly set in your frontend application configuration (In Vercel's environment variables).
