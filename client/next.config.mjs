@@ -1,6 +1,6 @@
 let userConfig = undefined
 try {
-  userConfig = await import("./v0-user-next.config")
+  userConfig = await import('./v0-user-next.config')
 } catch (e) {
   // ignore error
 }
@@ -27,34 +27,34 @@ const nextConfig = {
     // In Docker: use internal service name, otherwise use env var or localhost
     let apiUrl
 
-    if (process.env.NODE_ENV === "production" && !process.env.NEXT_PUBLIC_API_URL) {
+    if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_API_URL) {
       // Production Docker environment - use internal service name
-      apiUrl = "http://backend:8000"
+      apiUrl = 'http://backend:8000'
     } else {
       // Development or when NEXT_PUBLIC_API_URL is explicitly set
-      apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
     }
 
-    console.log("API URL used for rewrites:", apiUrl)
+    console.log('API URL used for rewrites:', apiUrl)
 
     // Log both client and server side environment
-    console.log("Environment:", {
+    console.log('Environment:', {
       NODE_ENV: process.env.NODE_ENV,
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     })
 
     return [
       {
-        source: "/api/:path*",
+        source: '/api/:path*',
         destination: `${apiUrl}/api/:path*`,
       },
       // Add root-level API endpoints for health checks
       {
-        source: "/healthz",
+        source: '/healthz',
         destination: `${apiUrl}/healthz`,
       },
       {
-        source: "/readyz",
+        source: '/readyz',
         destination: `${apiUrl}/readyz`,
       },
     ]
@@ -69,7 +69,7 @@ function mergeConfig(nextConfig, userConfig) {
   }
 
   for (const key in userConfig) {
-    if (typeof nextConfig[key] === "object" && !Array.isArray(nextConfig[key])) {
+    if (typeof nextConfig[key] === 'object' && !Array.isArray(nextConfig[key])) {
       nextConfig[key] = {
         ...nextConfig[key],
         ...userConfig[key],

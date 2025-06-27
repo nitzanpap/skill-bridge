@@ -1,98 +1,90 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Star, ArrowUp, TrendingUp } from "lucide-react";
-import { SkillBridgeResponse } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ExternalLink, Star, ArrowUp, TrendingUp } from 'lucide-react'
+import { SkillBridgeResponse } from '@/lib/api'
 
 interface CourseRecommendationsDisplayProps {
-  recommendations: SkillBridgeResponse;
+  recommendations: SkillBridgeResponse
 }
 
 export function CourseRecommendationsDisplay({
   recommendations,
 }: CourseRecommendationsDisplayProps) {
-  const { recommended_courses, skill_gap } = recommendations;
+  const { recommended_courses, skill_gap } = recommendations
 
   // Find the course with the highest potential score
   const maxPotentialScore = Math.max(
     ...recommended_courses.map((course) => course.potential_score || 0),
-  );
+  )
 
   return (
-    <div className="grid gap-6">
+    <div className='grid gap-6'>
       {/* Main Recommendations Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className='flex items-center justify-between'>
             <span>Course Recommendations</span>
-            <Badge variant="outline" className="ml-2">
+            <Badge variant='outline' className='ml-2'>
               {recommended_courses.length} courses
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {/* Introduction */}
-            <div className="rounded-lg bg-muted p-4">
-              <h3 className="font-semibold">Based on your skill gap</h3>
-              <div className="mt-2 flex flex-wrap gap-2">
+            <div className='rounded-lg bg-muted p-4'>
+              <h3 className='font-semibold'>Based on your skill gap</h3>
+              <div className='mt-2 flex flex-wrap gap-2'>
                 {skill_gap.map((skill, index) => (
                   <Badge
                     key={index}
-                    variant="outline"
-                    className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400"
+                    variant='outline'
+                    className='bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 dark:text-blue-400'
                   >
                     {skill}
                   </Badge>
                 ))}
                 {skill_gap.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    No skill gaps identified
-                  </p>
+                  <p className='text-sm text-muted-foreground'>No skill gaps identified</p>
                 )}
               </div>
             </div>
 
             {/* Course Cards */}
-            <div className="space-y-4">
+            <div className='space-y-4'>
               {recommended_courses.map((course, index) => {
                 const isHighestScore =
-                  course.potential_score === maxPotentialScore &&
-                  course.score_improvement > 0;
-                const potentialScoreValue =
-                  course.potential_score?.toFixed(1) || "0.0";
-                const scoreImprovement =
-                  course.score_improvement?.toFixed(1) || "0.0";
+                  course.potential_score === maxPotentialScore && course.score_improvement > 0
+                const potentialScoreValue = course.potential_score?.toFixed(1) || '0.0'
+                const scoreImprovement = course.score_improvement?.toFixed(1) || '0.0'
 
                 return (
                   <div
                     key={index}
-                    className={`flex flex-col space-y-2 rounded-lg border p-4 transition-all relative
-                      ${
-                        isHighestScore
-                          ? "border-green-500 border-2 bg-green-50 dark:bg-green-950/20 shadow-lg animate-pulse-shadow"
-                          : "hover:bg-accent/50"
-                      }`}
+                    className={`relative flex flex-col space-y-2 rounded-lg border p-4 transition-all ${
+                      isHighestScore
+                        ? 'animate-pulse-shadow border-2 border-green-500 bg-green-50 shadow-lg dark:bg-green-950/20'
+                        : 'hover:bg-accent/50'
+                    }`}
                   >
                     {isHighestScore && (
-                      <div className="absolute -top-3 -right-3 bg-green-500 text-white rounded-full p-1">
-                        <Star className="h-5 w-5 fill-white" />
+                      <div className='absolute -right-3 -top-3 rounded-full bg-green-500 p-1 text-white'>
+                        <Star className='h-5 w-5 fill-white' />
                       </div>
                     )}
-                    <div className="flex items-start justify-between">
+                    <div className='flex items-start justify-between'>
                       <div>
                         <h3
                           className={`font-semibold ${
-                            isHighestScore
-                              ? "text-green-700 dark:text-green-300"
-                              : ""
+                            isHighestScore ? 'text-green-700 dark:text-green-300' : ''
                           }`}
                         >
                           {index + 1}. {course.course_name}
                         </h3>
-                        <div className="flex flex-wrap gap-2 mt-1">
+                        <div className='mt-1 flex flex-wrap gap-2'>
                           {isHighestScore ? (
                             <>
                               {/* // TODO: Add back in */}
@@ -105,12 +97,12 @@ export function CourseRecommendationsDisplay({
                                   {potentialScoreValue}%
                                 </span>
                               </div> */}
-                              <div className="bg-green-100 dark:bg-green-900/40 border border-green-200 dark:border-green-800 p-1 px-3 rounded-md flex items-center shadow-md scale-in">
-                                <ArrowUp className="h-4 w-4 text-green-700 dark:text-green-300 mr-1" />
-                                <span className="text-green-800 dark:text-green-200 text-xl font-extrabold animate-glow-text">
+                              <div className='scale-in flex items-center rounded-md border border-green-200 bg-green-100 p-1 px-3 shadow-md dark:border-green-800 dark:bg-green-900/40'>
+                                <ArrowUp className='mr-1 h-4 w-4 text-green-700 dark:text-green-300' />
+                                <span className='animate-glow-text text-xl font-extrabold text-green-800 dark:text-green-200'>
                                   +{scoreImprovement}%
                                 </span>
-                                <span className="text-green-800 dark:text-green-200 text-xs font-medium ml-1">
+                                <span className='ml-1 text-xs font-medium text-green-800 dark:text-green-200'>
                                   boost
                                 </span>
                               </div>
@@ -125,45 +117,43 @@ export function CourseRecommendationsDisplay({
                                 Potential Score: {potentialScoreValue}%
                               </Badge> */}
                               <Badge
-                                variant="outline"
-                                className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200"
+                                variant='outline'
+                                className='bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200'
                               >
                                 +{scoreImprovement}% improvement
                               </Badge>
                             </>
                           )}
                           {isHighestScore && (
-                            <Badge className="bg-green-500 text-white font-bold">
-                              Best Match
-                            </Badge>
+                            <Badge className='bg-green-500 font-bold text-white'>Best Match</Badge>
                           )}
                         </div>
                       </div>
                       {course.url && (
                         <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 gap-1"
-                          onClick={() => window.open(course.url, "_blank")}
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 gap-1'
+                          onClick={() => window.open(course.url, '_blank')}
                         >
                           <ExternalLink size={14} />
-                          <span className="hidden sm:inline">Visit Course</span>
+                          <span className='hidden sm:inline'>Visit Course</span>
                         </Button>
                       )}
                     </div>
                     {course.description && (
-                      <p className="text-sm text-muted-foreground">
+                      <p className='text-sm text-muted-foreground'>
                         {course.description.length > 200
                           ? `${course.description.substring(0, 200)}...`
                           : course.description}
                       </p>
                     )}
                   </div>
-                );
+                )
               })}
 
               {recommended_courses.length === 0 && (
-                <p className="rounded-lg border border-dashed p-6 text-center text-muted-foreground">
+                <p className='rounded-lg border border-dashed p-6 text-center text-muted-foreground'>
                   No course recommendations available
                 </p>
               )}
@@ -178,52 +168,48 @@ export function CourseRecommendationsDisplay({
           <CardTitle>Learning Resources</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Here are some additional platforms where you can find courses to
-            help bridge your skill gap:
+          <p className='mb-4 text-sm text-muted-foreground'>
+            Here are some additional platforms where you can find courses to help bridge your skill
+            gap:
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className='flex flex-wrap gap-2'>
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8"
-              onClick={() => window.open("https://www.coursera.org", "_blank")}
+              variant='outline'
+              size='sm'
+              className='h-8'
+              onClick={() => window.open('https://www.coursera.org', '_blank')}
             >
               Coursera
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8"
-              onClick={() => window.open("https://www.udemy.com", "_blank")}
+              variant='outline'
+              size='sm'
+              className='h-8'
+              onClick={() => window.open('https://www.udemy.com', '_blank')}
             >
               Udemy
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8"
-              onClick={() =>
-                window.open("https://www.pluralsight.com", "_blank")
-              }
+              variant='outline'
+              size='sm'
+              className='h-8'
+              onClick={() => window.open('https://www.pluralsight.com', '_blank')}
             >
               Pluralsight
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8"
-              onClick={() => window.open("https://www.edx.org", "_blank")}
+              variant='outline'
+              size='sm'
+              className='h-8'
+              onClick={() => window.open('https://www.edx.org', '_blank')}
             >
               edX
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8"
-              onClick={() =>
-                window.open("https://www.linkedin.com/learning", "_blank")
-              }
+              variant='outline'
+              size='sm'
+              className='h-8'
+              onClick={() => window.open('https://www.linkedin.com/learning', '_blank')}
             >
               LinkedIn Learning
             </Button>
@@ -231,5 +217,5 @@ export function CourseRecommendationsDisplay({
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

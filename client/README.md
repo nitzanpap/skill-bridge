@@ -1,6 +1,8 @@
 # SkillBridge Frontend
 
-A modern web application for the SkillBridge platform. This client application provides an intuitive interface for resume analysis, job requirement matching, skill gap identification, and course recommendations using semantic matching technology.
+A modern web application for the SkillBridge platform. This client application provides an intuitive
+interface for resume analysis, job requirement matching, skill gap identification, and course
+recommendations using semantic matching technology.
 
 ## Features
 
@@ -43,13 +45,15 @@ A modern web application for the SkillBridge platform. This client application p
 - Docker (required for deployment)
 - **Supported Platforms**: Any platform that can run Docker
 
-> **Note**: The application is designed to run exclusively through Docker to ensure consistent environments across development and production.
+> **Note**: The application is designed to run exclusively through Docker to ensure consistent
+> environments across development and production.
 
 #### Installing Docker
 
 Docker allows you to run applications in containers, making setup much easier:
 
-1. Download and install Docker Desktop from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+1. Download and install Docker Desktop from
+   [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
 2. Follow the installation wizard instructions for your operating system
 3. After installation, start Docker Desktop
 4. Verify installation by running `docker --version` in your terminal/command prompt
@@ -86,7 +90,8 @@ docker build -t skillbridge-frontend .
 docker run -p 3000:3000 -e NEXT_PUBLIC_API_URL=http://host.docker.internal:8000 skillbridge-frontend
 ```
 
-Note: When running just the frontend container, you'll need to ensure the backend is accessible and add the `--add-host=host.docker.internal:host-gateway` flag on Linux.
+Note: When running just the frontend container, you'll need to ensure the backend is accessible and
+add the `--add-host=host.docker.internal:host-gateway` flag on Linux.
 
 ## Usage
 
@@ -94,7 +99,8 @@ The application provides a simple interface to:
 
 1. Input your resume text
 2. Input a job description text
-3. Adjust the similarity threshold for matching (lower values match more skills with weaker similarities)
+3. Adjust the similarity threshold for matching (lower values match more skills with weaker
+   similarities)
 4. Submit for analysis
 
 The results will display:
@@ -102,7 +108,8 @@ The results will display:
 - An overall match score between your resume and the job description
 - A list of matched skills
 - A list of missing skills
-- Detailed matching information showing the similarity between each job skill and your closest matching skill
+- Detailed matching information showing the similarity between each job skill and your closest
+  matching skill
 - Personalized course recommendations to help bridge identified skill gaps
 - Predicted score improvements for each recommended course
 - Direct links to course platforms
@@ -134,14 +141,16 @@ client/
 
 The frontend communicates with the backend through a RESTful API. The main endpoints used are:
 
-- `POST /api/v1/compare-skills/semantic`: Compares resume skills against job requirements using semantic matching
+- `POST /api/v1/compare-skills/semantic`: Compares resume skills against job requirements using
+  semantic matching
 - `POST /api/v1/recommend-courses`: Gets course recommendations based on identified skill gaps
 
 See the `api.ts` file for implementation details.
 
 ## Theming
 
-The application supports both light and dark modes through a theme toggle in the top right corner. Themes are implemented using CSS variables and persistent storage to remember user preferences.
+The application supports both light and dark modes through a theme toggle in the top right corner.
+Themes are implemented using CSS variables and persistent storage to remember user preferences.
 
 ## Technologies Used
 
@@ -166,7 +175,6 @@ The application supports both light and dark modes through a theme toggle in the
    - Delete node_modules folder and package-lock.json, then run `npm install` again
 
 2. **NVM not recognized**:
-
    - Make sure NVM is installed and properly set up in your PATH
    - Restart your terminal/command prompt after installation
 

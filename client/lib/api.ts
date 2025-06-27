@@ -1,21 +1,25 @@
 // API base URL - use relative URL when in browser environment
 // to leverage Next.js rewrites and avoid CORS issues
-const isClient = typeof window !== "undefined"
+const isClient = typeof window !== 'undefined'
 const API_BASE_URL = isClient
-  ? "" // Always use relative URLs on client side to leverage Next.js rewrites
-  : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-const API_PREFIX = "/api/v1"
+  ? '' // Always use relative URLs on client side to leverage Next.js rewrites
+  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_PREFIX = '/api/v1'
+
+const NODE_ENV = process.env.NODE_ENV
 
 // Default timeout for API requests (in milliseconds) set to 6 minutes
 const DEFAULT_TIMEOUT = 360000
 
-// Log the API URL configuration
-console.log("API configuration:", {
-  isClient,
-  API_BASE_URL,
-  API_PREFIX,
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-})
+if (NODE_ENV !== 'production') {
+  // Log the API URL configuration
+  console.log('API configuration:', {
+    isClient,
+    API_BASE_URL,
+    API_PREFIX,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  })
+}
 
 /**
  * Creates a fetch request with a timeout
@@ -27,7 +31,7 @@ console.log("API configuration:", {
 const fetchWithTimeout = async (
   url: string,
   options: RequestInit = {},
-  timeout: number = DEFAULT_TIMEOUT
+  timeout: number = DEFAULT_TIMEOUT,
 ): Promise<Response> => {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeout)
@@ -54,7 +58,7 @@ export interface Entity {
 export const checkServerReadiness = async (): Promise<boolean> => {
   try {
     const response = await fetchWithTimeout(`${API_BASE_URL}/readyz`, {
-      method: "GET",
+      method: 'GET',
     })
 
     if (!response.ok) {
@@ -62,9 +66,9 @@ export const checkServerReadiness = async (): Promise<boolean> => {
     }
 
     const data = await response.json()
-    return data.status === "ready"
+    return data.status === 'ready'
   } catch (error) {
-    console.error("Server readiness check failed:", error)
+    console.error('Server readiness check failed:', error)
     return false
   }
 }
@@ -104,13 +108,13 @@ export interface SkillBridgeResponse {
 export const getSkillBridgeData = async (
   resumeText: string,
   jobDescriptionText: string,
-  threshold: number = 0.5
+  threshold: number = 0.5,
 ): Promise<SkillBridgeResponse> => {
   try {
     const response = await fetchWithTimeout(`${API_BASE_URL}${API_PREFIX}/recommend-courses`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         resume_text: resumeText,
@@ -126,7 +130,7 @@ export const getSkillBridgeData = async (
     const data: SkillBridgeResponse = await response.json()
     return data
   } catch (error) {
-    console.error("Error getting skill bridge data:", error)
+    console.error('Error getting skill bridge data:', error)
     throw error
   }
 }
