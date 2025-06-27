@@ -66,16 +66,26 @@ export function ResumeAnalysisForm({ analysis }: ResumeAnalysisFormProps) {
         </div>
       </CardContent>
       <CardFooter className='flex flex-wrap items-center justify-between gap-2'>
-        <Button onClick={analyzeResume} disabled={isAnalyzeDisabled} className='w-full sm:w-auto'>
-          {isProcessing ? (
-            <>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Analyzing...
-            </>
-          ) : (
-            'Analyze Resume'
-          )}
-        </Button>
+        <div className='flex w-full gap-2 sm:w-auto'>
+          <Button
+            onClick={analyzeResume}
+            disabled={isAnalyzeDisabled}
+            className='flex-1 sm:flex-none'
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Analyzing...
+              </>
+            ) : (
+              'Analyze Resume'
+            )}
+          </Button>
+
+          <Button variant='outline' onClick={analysis.startDemo} disabled={isProcessing}>
+            🎬 Demo
+          </Button>
+        </div>
 
         {isProcessing && processingStatus && (
           <p className='text-sm text-muted-foreground'>{processingStatus}</p>
