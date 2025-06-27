@@ -80,12 +80,39 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   // Refs for timers and intervals
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null)
   const stageTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const stageProgressIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const startTimeRef = useRef<number>(0)
+  const pausedTimeRef = useRef<number>(0)
+  const isPausedRef = useRef<boolean>(false)
+  const pausedAtRef = useRef<number>(0)
+  const totalPausedTimeRef = useRef<number>(0)
+  const actualCurrentStageRef = useRef<ProcessingStage>(ProcessingStage.IDLE)
 
   const resetResults = useCallback(() => {
     setSkillData(null)
     setRecommendationData(null)
     setProcessingStatus('')
+
+    // Reset pause state
+    isPausedRef.current = false
+    pausedAtRef.current = 0
+    totalPausedTimeRef.current = 0
+    actualCurrentStageRef.current = ProcessingStage.IDLE
+
+    // Cleanup timers
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current)
+      progressTimerRef.current = null
+    }
+    if (stageTimerRef.current) {
+      clearTimeout(stageTimerRef.current)
+      stageTimerRef.current = null
+    }
+    if (stageProgressIntervalRef.current) {
+      clearInterval(stageProgressIntervalRef.current)
+      stageProgressIntervalRef.current = null
+    }
+
     setProcessingState({
       currentStage: ProcessingStage.IDLE,
       stageProgress: Object.values(ProcessingStage).reduce(
@@ -104,6 +131,22 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       playbackState: PlaybackState.STOPPED,
       isInteractive: false,
     })
+  }, [])
+
+  // Cleanup all timers
+  const cleanupTimers = useCallback(() => {
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current)
+      progressTimerRef.current = null
+    }
+    if (stageTimerRef.current) {
+      clearTimeout(stageTimerRef.current)
+      stageTimerRef.current = null
+    }
+    if (stageProgressIntervalRef.current) {
+      clearInterval(stageProgressIntervalRef.current)
+      stageProgressIntervalRef.current = null
+    }
   }, [])
 
   // Calculate total estimated time
@@ -146,6 +189,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       const stageInfo = PROCESSING_STAGES[stage]
       const duration = stageInfo.estimatedDuration
 
+      // Update the actual current stage reference
+      actualCurrentStageRef.current = stage
+
       // Update models for this stage
       const models = createModelStatus(stage)
 
@@ -162,6 +208,11 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
       return new Promise<void>((resolve) => {
         const progressInterval = setInterval(() => {
+          // Check if paused
+          if (isPausedRef.current) {
+            return // Skip this update cycle but keep the interval running
+          }
+
           currentUpdate++
           const progress = Math.min((currentUpdate / totalUpdates) * 100, 100)
 
@@ -208,9 +259,13 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
           if (progress >= 100) {
             clearInterval(progressInterval)
+            stageProgressIntervalRef.current = null
             resolve()
           }
         }, updateInterval)
+
+        // Store the interval reference for cleanup
+        stageProgressIntervalRef.current = progressInterval
       })
     },
     [createModelStatus],
@@ -218,17 +273,25 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
   // Main processing simulation
   const simulateProcessing = useCallback(async () => {
+    isPausedRef.current = false
     startTimeRef.current = Date.now()
+    totalPausedTimeRef.current = 0
+    actualCurrentStageRef.current = ProcessingStage.DATA_RECEPTION
     const totalEstimatedTime = getTotalEstimatedTime()
 
     setProcessingState((prev) => ({
       ...prev,
       estimatedTimeRemaining: totalEstimatedTime,
+      playbackState: PlaybackState.PLAYING,
     }))
 
     // Update elapsed time every second
     progressTimerRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTimeRef.current
+      if (isPausedRef.current) {
+        return // Skip updates when paused
+      }
+
+      const elapsed = Date.now() - startTimeRef.current - totalPausedTimeRef.current
       setProcessingState((prev) => ({
         ...prev,
         timeElapsed: elapsed,
@@ -238,6 +301,11 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
     // Process each stage
     for (let i = 0; i < STAGE_ORDER.length; i++) {
+      // Wait for pause to resume before starting next stage
+      while (isPausedRef.current) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+
       const stage = STAGE_ORDER[i]
       await simulateStageProgress(stage, i)
     }
@@ -252,14 +320,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   // Clean up timers on unmount
   useEffect(() => {
     return () => {
-      if (progressTimerRef.current) {
-        clearInterval(progressTimerRef.current)
-      }
-      if (stageTimerRef.current) {
-        clearTimeout(stageTimerRef.current)
-      }
+      cleanupTimers()
     }
-  }, [])
+  }, [cleanupTimers])
 
   const analyzeResume = useCallback(async () => {
     if (!resumeText.trim() || !jobDescriptionText.trim()) {
@@ -332,6 +395,12 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
   // Demo and Interactive Controls
   const startDemo = useCallback(() => {
+    // Reset pause state
+    isPausedRef.current = false
+    pausedAtRef.current = 0
+    totalPausedTimeRef.current = 0
+    actualCurrentStageRef.current = ProcessingStage.DATA_RECEPTION
+
     setShowProcessingModal(true)
     setProcessingState((prev) => ({
       ...prev,
@@ -361,10 +430,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   }, [simulateProcessing, getTotalEstimatedTime])
 
   const pauseAnimation = useCallback(() => {
-    if (progressTimerRef.current) {
-      clearInterval(progressTimerRef.current)
-      progressTimerRef.current = null
-    }
+    isPausedRef.current = true
+    pausedAtRef.current = Date.now()
+
     setProcessingState((prev) => ({
       ...prev,
       playbackState: PlaybackState.PAUSED,
@@ -372,32 +440,42 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   }, [])
 
   const resumeAnimation = useCallback(() => {
+    if (isPausedRef.current && pausedAtRef.current > 0) {
+      const pauseDuration = Date.now() - pausedAtRef.current
+      totalPausedTimeRef.current += pauseDuration
+    }
+
+    isPausedRef.current = false
+    pausedAtRef.current = 0
+
+    // Return to the actual current stage where the animation should be
     setProcessingState((prev) => ({
       ...prev,
+      currentStage: actualCurrentStageRef.current,
       playbackState: PlaybackState.PLAYING,
     }))
-
-    if (!progressTimerRef.current) {
-      const remainingTime = processingState.estimatedTimeRemaining
-      startTimeRef.current = Date.now() - (getTotalEstimatedTime() - remainingTime)
-
-      // Resume the timer
-      progressTimerRef.current = setInterval(() => {
-        const elapsed = Date.now() - startTimeRef.current
-        setProcessingState((prev) => ({
-          ...prev,
-          timeElapsed: elapsed,
-          estimatedTimeRemaining: Math.max(0, remainingTime - elapsed),
-        }))
-      }, 1000)
-    }
-  }, [getTotalEstimatedTime, processingState.estimatedTimeRemaining])
+  }, [])
 
   const stopAnimation = useCallback(() => {
+    isPausedRef.current = false
+    pausedAtRef.current = 0
+    totalPausedTimeRef.current = 0
+    actualCurrentStageRef.current = ProcessingStage.IDLE
+
+    // Cleanup timers
     if (progressTimerRef.current) {
       clearInterval(progressTimerRef.current)
       progressTimerRef.current = null
     }
+    if (stageTimerRef.current) {
+      clearTimeout(stageTimerRef.current)
+      stageTimerRef.current = null
+    }
+    if (stageProgressIntervalRef.current) {
+      clearInterval(stageProgressIntervalRef.current)
+      stageProgressIntervalRef.current = null
+    }
+
     setProcessingState((prev) => ({
       ...prev,
       currentStage: ProcessingStage.IDLE,
@@ -423,10 +501,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     setProcessingState((prev) => ({
       ...prev,
       currentStage: stage,
-      stageProgress: {
-        ...prev.stageProgress,
-        [stage]: 100,
-      },
+      // Don't update stage progress when manually navigating
     }))
   }, [])
 
@@ -439,10 +514,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       return {
         ...prev,
         currentStage: nextStage,
-        stageProgress: {
-          ...prev.stageProgress,
-          [nextStage]: 100,
-        },
+        // Don't update stage progress when manually navigating
       }
     })
   }, [])
@@ -456,10 +528,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       return {
         ...prev,
         currentStage: previousStage,
-        stageProgress: {
-          ...prev.stageProgress,
-          [previousStage]: 100,
-        },
+        // Don't update stage progress when manually navigating
       }
     })
   }, [])
