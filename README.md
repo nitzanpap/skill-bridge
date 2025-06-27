@@ -101,6 +101,39 @@ Docker allows you to run applications in containers, making setup much easier:
 The API will be available at <http://localhost:8000> with documentation at <http://localhost:8000/docs>
 The frontend application will be available at <http://localhost:3000>
 
+## Deployment
+
+### Client Deployment
+
+- **Vercel**: The frontend is deployed on Vercel for easy hosting and scaling. It automatically builds and deploys from the main branch.
+
+### Backend Deployment
+
+- **Docker**: The backend is containerized using Docker, allowing for easy deployment on any platform that supports Docker:
+
+    ```bash
+    docker build -t skill-bridge-backend .
+    docker run -d -p 8000:8000 skill-bridge-backend
+    ```
+
+#### Where to deploy
+
+You can deploy the backend on any cloud provider that supports Docker build/compose, but these are the already configured options:
+
+1. **Railway**: A platform that allows you to deploy Docker containers easily. You can set up a new project, connect your GitHub repository, and it will automatically build and deploy your backend.
+
+2. **Locally with ngrok**: If you want to test locally, you can use ngrok to expose your local backend server to the internet. This is useful for development and testing purposes.
+
+    ```bash
+    # Install ngrok if not already installed
+    npm install -g ngrok
+
+    # Start ngrok to expose your local backend
+    ngrok http --url=monkey-holy-corgi.ngrok-free.app 8000
+    ```
+
+Whatever method you choose, ensure that the backend URL is correctly set in your frontend application configuration (In Vercel's environment variables).
+
 ## Usage
 
 The application provides a simple web interface where you can:
