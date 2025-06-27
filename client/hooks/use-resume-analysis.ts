@@ -38,7 +38,7 @@ export interface UseResumeAnalysisResult {
   closeProcessingModal: () => void
 
   // Demo and Interactive Controls
-  startDemo: () => void
+  startDemoAnalysis: () => void
   pauseAnimation: () => void
   resumeAnimation: () => void
   stopAnimation: () => void
@@ -656,7 +656,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     analyzeResume,
     resetResults,
     closeProcessingModal,
-    startDemo,
+    startDemoAnalysis: startDemo,
     pauseAnimation,
     resumeAnimation,
     stopAnimation,
