@@ -23,7 +23,7 @@ export default function Home() {
       {/* Processing Modal */}
       <ProcessingModal
         isOpen={analysis.showProcessingModal}
-        onClose={() => analysis.setShowProcessingModal(false)}
+        onClose={analysis.closeProcessingModal}
         processingState={analysis.processingState}
         onPause={analysis.pauseAnimation}
         onResume={analysis.resumeAnimation}

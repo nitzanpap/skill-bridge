@@ -82,8 +82,8 @@ export function ResumeAnalysisForm({ analysis }: ResumeAnalysisFormProps) {
             )}
           </Button>
 
-          <Button variant='outline' onClick={analysis.startDemo} disabled={isProcessing}>
-            🎬 Demo
+          <Button variant='outline' onClick={analysis.startDemoAnalysis} disabled={isProcessing}>
+            🎬 Understand Analysis
           </Button>
         </div>
 
