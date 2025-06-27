@@ -1,13 +1,16 @@
 'use client'
 
-import { X } from 'lucide-react'
+import { X, Play, Pause, Square, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   ProcessingState,
   ProcessingStage,
   StageStatus,
   PROCESSING_STAGES,
+  ProcessingMode,
+  PlaybackState,
 } from '@/types/processing'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { StageIndicator } from '@/components/processing/stage-indicator'
 import { ModelCard } from '@/components/processing/model-card'
 import { ProgressPipeline } from '@/components/processing/progress-pipeline'
@@ -17,9 +20,25 @@ interface ProcessingModalProps {
   isOpen: boolean
   onClose: () => void
   processingState: ProcessingState
+  onPause?: () => void
+  onResume?: () => void
+  onStop?: () => void
+  onNextStage?: () => void
+  onPreviousStage?: () => void
+  onGoToStage?: (stage: ProcessingStage) => void
 }
 
-export function ProcessingModal({ isOpen, onClose, processingState }: ProcessingModalProps) {
+export function ProcessingModal({
+  isOpen,
+  onClose,
+  processingState,
+  onPause,
+  onResume,
+  onStop,
+  onNextStage,
+  onPreviousStage,
+  onGoToStage,
+}: ProcessingModalProps) {
   const {
     currentStage,
     timeElapsed,
@@ -27,6 +46,9 @@ export function ProcessingModal({ isOpen, onClose, processingState }: Processing
     modelsInUse,
     totalProgress,
     extractedSkills,
+    mode,
+    playbackState,
+    isInteractive,
   } = processingState
 
   const formatTime = (ms: number) => {
@@ -39,7 +61,7 @@ export function ProcessingModal({ isOpen, onClose, processingState }: Processing
 
   return (
     <Dialog open={isOpen} onOpenChange={() => isCompleted && onClose()}>
-      <DialogContent className='max-h-[90vh] max-w-4xl overflow-y-auto'>
+      <DialogContent className='max-h-[90vh] max-w-6xl overflow-y-auto'>
         {/* Header */}
         <DialogHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
           <div className='flex items-center space-x-3'>
@@ -68,6 +90,8 @@ export function ProcessingModal({ isOpen, onClose, processingState }: Processing
           <ProgressPipeline
             currentStage={currentStage}
             stageProgress={processingState.stageProgress}
+            isInteractive={isInteractive}
+            onStageClick={onGoToStage}
           />
         </div>
 
@@ -94,6 +118,58 @@ export function ProcessingModal({ isOpen, onClose, processingState }: Processing
             extractedSkills={extractedSkills}
           />
         </div>
+
+        {/* Interactive Controls - Only show in demo mode */}
+        {mode === ProcessingMode.DEMO && isInteractive && (
+          <div className='mb-6'>
+            <div className='flex items-center justify-between rounded-lg bg-secondary p-4'>
+              <div className='flex items-center space-x-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={onPreviousStage}
+                  disabled={currentStage === ProcessingStage.DATA_RECEPTION}
+                >
+                  <ChevronLeft className='h-4 w-4' />
+                  Previous
+                </Button>
+
+                {playbackState === PlaybackState.PLAYING ? (
+                  <Button variant='outline' size='sm' onClick={onPause}>
+                    <Pause className='h-4 w-4' />
+                    Pause
+                  </Button>
+                ) : (
+                  <Button variant='outline' size='sm' onClick={onResume}>
+                    <Play className='h-4 w-4' />
+                    Resume
+                  </Button>
+                )}
+
+                <Button variant='outline' size='sm' onClick={onStop}>
+                  <Square className='h-4 w-4' />
+                  Stop
+                </Button>
+
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={onNextStage}
+                  disabled={currentStage === ProcessingStage.COMPLETED}
+                >
+                  Next
+                  <ChevronRight className='h-4 w-4' />
+                </Button>
+              </div>
+
+              <div className='text-sm text-muted-foreground'>
+                <span className='rounded bg-blue-100 px-2 py-1 text-blue-800 dark:bg-blue-900 dark:text-blue-200'>
+                  Demo Mode
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Models in Use */}
         {modelsInUse.length > 0 && (

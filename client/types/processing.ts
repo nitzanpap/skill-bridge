@@ -17,6 +17,17 @@ export enum StageStatus {
   FAILED = 'failed',
 }
 
+export enum ProcessingMode {
+  ANALYSIS = 'analysis',
+  DEMO = 'demo',
+}
+
+export enum PlaybackState {
+  PLAYING = 'playing',
+  PAUSED = 'paused',
+  STOPPED = 'stopped',
+}
+
 export interface ModelStatus {
   name: string
   type: 'NER' | 'Embedding' | 'LLM' | 'Database'
@@ -44,6 +55,9 @@ export interface ProcessingState {
   estimatedTimeRemaining: number
   modelsInUse: ModelStatus[]
   totalProgress: number
+  mode: ProcessingMode
+  playbackState: PlaybackState
+  isInteractive: boolean
 }
 
 export const PROCESSING_STAGES: Record<ProcessingStage, ProcessingStageInfo> = {

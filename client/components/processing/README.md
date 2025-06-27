@@ -30,7 +30,6 @@ Dynamic visualization component that changes based on the current processing sta
 
 ```tsx
 import { ProcessingModal } from '@/components/processing'
-
 ;<ProcessingModal
   isOpen={showModal}
   onClose={() => setShowModal(false)}

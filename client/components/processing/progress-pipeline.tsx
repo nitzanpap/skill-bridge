@@ -9,12 +9,16 @@ interface ProgressPipelineProps {
   currentStage: ProcessingStage
   stageProgress: Record<ProcessingStage, number>
   className?: string
+  isInteractive?: boolean
+  onStageClick?: (stage: ProcessingStage) => void
 }
 
 export function ProgressPipeline({
   currentStage,
   stageProgress,
   className,
+  isInteractive = false,
+  onStageClick,
 }: ProgressPipelineProps) {
   const getStageStatus = (stage: ProcessingStage): StageStatus => {
     if (stageProgress[stage] === 100) return StageStatus.COMPLETED
@@ -40,13 +44,22 @@ export function ProgressPipeline({
           return (
             <div key={stage} className='flex min-w-0 items-center'>
               {/* Stage */}
-              <div className='flex min-w-0 flex-col items-center'>
+              <div
+                className={cn(
+                  'flex min-w-0 flex-col items-center',
+                  isInteractive &&
+                    onStageClick &&
+                    'cursor-pointer transition-transform hover:scale-105',
+                )}
+                onClick={() => isInteractive && onStageClick?.(stage)}
+              >
                 <StageIndicator stage={stage} status={status} size='md' className='mb-2' />
                 <div className='min-w-0 text-center'>
                   <div
                     className={cn(
                       'max-w-20 truncate text-xs font-medium',
                       active ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600',
+                      isInteractive && 'hover:text-blue-600 dark:hover:text-blue-400',
                     )}
                   >
                     {stageInfo.name}

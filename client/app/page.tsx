@@ -25,6 +25,12 @@ export default function Home() {
         isOpen={analysis.showProcessingModal}
         onClose={() => analysis.setShowProcessingModal(false)}
         processingState={analysis.processingState}
+        onPause={analysis.pauseAnimation}
+        onResume={analysis.resumeAnimation}
+        onStop={analysis.stopAnimation}
+        onNextStage={analysis.nextStage}
+        onPreviousStage={analysis.previousStage}
+        onGoToStage={analysis.goToStage}
       />
     </div>
   )

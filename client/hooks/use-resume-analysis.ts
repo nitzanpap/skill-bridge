@@ -13,6 +13,8 @@ import {
   PROCESSING_STAGES,
   STAGE_ORDER,
   ModelStatus,
+  ProcessingMode,
+  PlaybackState,
 } from '@/types/processing'
 
 export interface UseResumeAnalysisResult {
@@ -34,6 +36,15 @@ export interface UseResumeAnalysisResult {
   analyzeResume: () => Promise<void>
   resetResults: () => void
   setShowProcessingModal: (show: boolean) => void
+
+  // Demo and Interactive Controls
+  startDemo: () => void
+  pauseAnimation: () => void
+  resumeAnimation: () => void
+  stopAnimation: () => void
+  goToStage: (stage: ProcessingStage) => void
+  nextStage: () => void
+  previousStage: () => void
 }
 
 export function useResumeAnalysis(): UseResumeAnalysisResult {
@@ -61,6 +72,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     estimatedTimeRemaining: 0,
     modelsInUse: [],
     totalProgress: 0,
+    mode: ProcessingMode.ANALYSIS,
+    playbackState: PlaybackState.STOPPED,
+    isInteractive: false,
   })
 
   // Refs for timers and intervals
@@ -86,6 +100,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       estimatedTimeRemaining: 0,
       modelsInUse: [],
       totalProgress: 0,
+      mode: ProcessingMode.ANALYSIS,
+      playbackState: PlaybackState.STOPPED,
+      isInteractive: false,
     })
   }, [])
 
@@ -313,6 +330,140 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     }
   }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing])
 
+  // Demo and Interactive Controls
+  const startDemo = useCallback(() => {
+    setShowProcessingModal(true)
+    setProcessingState((prev) => ({
+      ...prev,
+      currentStage: ProcessingStage.DATA_RECEPTION,
+      mode: ProcessingMode.DEMO,
+      playbackState: PlaybackState.PLAYING,
+      isInteractive: true,
+      stageProgress: Object.values(ProcessingStage).reduce(
+        (acc, stage) => {
+          acc[stage] = 0
+          return acc
+        },
+        {} as Record<ProcessingStage, number>,
+      ),
+      extractedSkills: {
+        resume: ['JavaScript', 'React', 'TypeScript', 'Node.js'],
+        job: ['React', 'TypeScript', 'AWS', 'Docker'],
+      },
+      timeElapsed: 0,
+      estimatedTimeRemaining: getTotalEstimatedTime(),
+      modelsInUse: [],
+      totalProgress: 0,
+    }))
+
+    // Start the demo simulation
+    simulateProcessing()
+  }, [simulateProcessing, getTotalEstimatedTime])
+
+  const pauseAnimation = useCallback(() => {
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current)
+      progressTimerRef.current = null
+    }
+    setProcessingState((prev) => ({
+      ...prev,
+      playbackState: PlaybackState.PAUSED,
+    }))
+  }, [])
+
+  const resumeAnimation = useCallback(() => {
+    setProcessingState((prev) => ({
+      ...prev,
+      playbackState: PlaybackState.PLAYING,
+    }))
+
+    if (!progressTimerRef.current) {
+      const remainingTime = processingState.estimatedTimeRemaining
+      startTimeRef.current = Date.now() - (getTotalEstimatedTime() - remainingTime)
+
+      // Resume the timer
+      progressTimerRef.current = setInterval(() => {
+        const elapsed = Date.now() - startTimeRef.current
+        setProcessingState((prev) => ({
+          ...prev,
+          timeElapsed: elapsed,
+          estimatedTimeRemaining: Math.max(0, remainingTime - elapsed),
+        }))
+      }, 1000)
+    }
+  }, [getTotalEstimatedTime, processingState.estimatedTimeRemaining])
+
+  const stopAnimation = useCallback(() => {
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current)
+      progressTimerRef.current = null
+    }
+    setProcessingState((prev) => ({
+      ...prev,
+      currentStage: ProcessingStage.IDLE,
+      playbackState: PlaybackState.STOPPED,
+      isInteractive: false,
+      stageProgress: Object.values(ProcessingStage).reduce(
+        (acc, stage) => {
+          acc[stage] = 0
+          return acc
+        },
+        {} as Record<ProcessingStage, number>,
+      ),
+      extractedSkills: { resume: [], job: [] },
+      timeElapsed: 0,
+      estimatedTimeRemaining: 0,
+      modelsInUse: [],
+      totalProgress: 0,
+    }))
+    setShowProcessingModal(false)
+  }, [])
+
+  const goToStage = useCallback((stage: ProcessingStage) => {
+    setProcessingState((prev) => ({
+      ...prev,
+      currentStage: stage,
+      stageProgress: {
+        ...prev.stageProgress,
+        [stage]: 100,
+      },
+    }))
+  }, [])
+
+  const nextStage = useCallback(() => {
+    setProcessingState((prev) => {
+      const currentIndex = STAGE_ORDER.indexOf(prev.currentStage)
+      const nextIndex = Math.min(currentIndex + 1, STAGE_ORDER.length - 1)
+      const nextStage = STAGE_ORDER[nextIndex]
+
+      return {
+        ...prev,
+        currentStage: nextStage,
+        stageProgress: {
+          ...prev.stageProgress,
+          [nextStage]: 100,
+        },
+      }
+    })
+  }, [])
+
+  const previousStage = useCallback(() => {
+    setProcessingState((prev) => {
+      const currentIndex = STAGE_ORDER.indexOf(prev.currentStage)
+      const previousIndex = Math.max(currentIndex - 1, 0)
+      const previousStage = STAGE_ORDER[previousIndex]
+
+      return {
+        ...prev,
+        currentStage: previousStage,
+        stageProgress: {
+          ...prev.stageProgress,
+          [previousStage]: 100,
+        },
+      }
+    })
+  }, [])
+
   return {
     resumeText,
     jobDescriptionText,
@@ -329,5 +480,12 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     analyzeResume,
     resetResults,
     setShowProcessingModal,
+    startDemo,
+    pauseAnimation,
+    resumeAnimation,
+    stopAnimation,
+    goToStage,
+    nextStage,
+    previousStage,
   }
 }
