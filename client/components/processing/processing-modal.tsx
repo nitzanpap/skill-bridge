@@ -1,6 +1,6 @@
 'use client'
 
-import { X, Play, Pause, Square, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Play, Pause, Square, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   ProcessingState,
   ProcessingStage,
@@ -60,33 +60,27 @@ export function ProcessingModal({
   const isCompleted = currentStage === ProcessingStage.COMPLETED
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => isCompleted && onClose()}>
-      <DialogContent className='max-h-[90vh] max-w-6xl overflow-y-auto'>
+    <Dialog open={isOpen} onOpenChange={() => onClose()}>
+      <DialogContent className='max-h-[95vh] w-[95vw] max-w-6xl overflow-y-auto p-4 md:p-6'>
         {/* Header */}
-        <DialogHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <DialogHeader className='flex flex-col space-y-2 pb-2 md:flex-row md:items-center md:justify-between md:space-y-0'>
           <div className='flex items-center space-x-3'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600'>
-              <span className='text-sm font-bold text-white'>SB</span>
+            <div className='flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 md:h-8 md:w-8'>
+              <span className='text-xs font-bold text-white md:text-sm'>SB</span>
             </div>
             <div>
-              <DialogTitle className='text-xl font-semibold'>Skill Bridge AI Analysis</DialogTitle>
-              <p className='text-sm text-muted-foreground'>
+              <DialogTitle className='text-lg font-semibold md:text-xl'>
+                Skill Bridge AI Analysis
+              </DialogTitle>
+              <p className='text-xs text-muted-foreground md:text-sm'>
                 Processing your resume and job requirements
               </p>
             </div>
           </div>
-          {isCompleted && (
-            <button
-              onClick={onClose}
-              className='rounded-md bg-secondary p-2 text-muted-foreground hover:text-foreground'
-            >
-              <X className='h-5 w-5' />
-            </button>
-          )}
         </DialogHeader>
 
         {/* Progress Pipeline */}
-        <div className='mb-8'>
+        <div className='mb-6 md:mb-8'>
           <ProgressPipeline
             currentStage={currentStage}
             stageProgress={processingState.stageProgress}
@@ -96,22 +90,24 @@ export function ProcessingModal({
         </div>
 
         {/* Current Stage Info */}
-        <div className='mb-6'>
-          <div className='mb-2 flex items-center space-x-3'>
+        <div className='mb-4 md:mb-6'>
+          <div className='mb-2 flex items-center space-x-2 md:space-x-3'>
             <StageIndicator
               stage={currentStage}
               status={isCompleted ? StageStatus.COMPLETED : StageStatus.IN_PROGRESS}
               size='sm'
             />
-            <div>
-              <h3 className='text-lg font-medium'>{currentStageInfo.name}</h3>
-              <p className='text-sm text-muted-foreground'>{currentStageInfo.description}</p>
+            <div className='min-w-0 flex-1'>
+              <h3 className='text-base font-medium md:text-lg'>{currentStageInfo.name}</h3>
+              <p className='text-xs text-muted-foreground md:text-sm'>
+                {currentStageInfo.description}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Stage Visualization */}
-        <div className='mb-8'>
+        <div className='mb-6 md:mb-8'>
           <StageVisualization
             stage={currentStage}
             progress={processingState.stageProgress[currentStage]}
@@ -121,34 +117,35 @@ export function ProcessingModal({
 
         {/* Interactive Controls - Only show in demo mode */}
         {mode === ProcessingMode.DEMO && isInteractive && (
-          <div className='mb-6'>
-            <div className='flex items-center justify-between rounded-lg bg-secondary p-4'>
-              <div className='flex items-center space-x-2'>
+          <div className='mb-4 md:mb-6'>
+            <div className='flex flex-col space-y-3 rounded-lg bg-secondary p-3 md:flex-row md:items-center md:justify-between md:space-y-0 md:p-4'>
+              <div className='flex flex-wrap items-center gap-2'>
                 <Button
                   variant='outline'
                   size='sm'
                   onClick={onPreviousStage}
                   disabled={currentStage === ProcessingStage.DATA_RECEPTION}
+                  className='text-xs'
                 >
-                  <ChevronLeft className='h-4 w-4' />
-                  Previous
+                  <ChevronLeft className='h-3 w-3 md:h-4 md:w-4' />
+                  <span className='hidden sm:inline'>Previous</span>
                 </Button>
 
                 {playbackState === PlaybackState.PLAYING ? (
-                  <Button variant='outline' size='sm' onClick={onPause}>
-                    <Pause className='h-4 w-4' />
-                    Pause
+                  <Button variant='outline' size='sm' onClick={onPause} className='text-xs'>
+                    <Pause className='h-3 w-3 md:h-4 md:w-4' />
+                    <span className='hidden sm:inline'>Pause</span>
                   </Button>
                 ) : (
-                  <Button variant='outline' size='sm' onClick={onResume}>
-                    <Play className='h-4 w-4' />
-                    Resume
+                  <Button variant='outline' size='sm' onClick={onResume} className='text-xs'>
+                    <Play className='h-3 w-3 md:h-4 md:w-4' />
+                    <span className='hidden sm:inline'>Resume</span>
                   </Button>
                 )}
 
-                <Button variant='outline' size='sm' onClick={onStop}>
-                  <Square className='h-4 w-4' />
-                  Stop
+                <Button variant='outline' size='sm' onClick={onStop} className='text-xs'>
+                  <Square className='h-3 w-3 md:h-4 md:w-4' />
+                  <span className='hidden sm:inline'>Stop</span>
                 </Button>
 
                 <Button
@@ -156,13 +153,14 @@ export function ProcessingModal({
                   size='sm'
                   onClick={onNextStage}
                   disabled={currentStage === ProcessingStage.COMPLETED}
+                  className='text-xs'
                 >
-                  Next
-                  <ChevronRight className='h-4 w-4' />
+                  <span className='hidden sm:inline'>Next</span>
+                  <ChevronRight className='h-3 w-3 md:h-4 md:w-4' />
                 </Button>
               </div>
 
-              <div className='text-sm text-muted-foreground'>
+              <div className='text-xs text-muted-foreground md:text-sm'>
                 <span className='rounded bg-blue-100 px-2 py-1 text-blue-800 dark:bg-blue-900 dark:text-blue-200'>
                   Demo Mode
                 </span>
@@ -173,9 +171,11 @@ export function ProcessingModal({
 
         {/* Models in Use */}
         {modelsInUse.length > 0 && (
-          <div className='mb-6'>
-            <h4 className='mb-3 text-sm font-medium text-muted-foreground'>AI Models in Use:</h4>
-            <div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
+          <div className='mb-4 md:mb-6'>
+            <h4 className='mb-3 text-xs font-medium text-muted-foreground md:text-sm'>
+              AI Models in Use:
+            </h4>
+            <div className='grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-3'>
               {modelsInUse.map((model, index) => (
                 <ModelCard key={index} model={model} />
               ))}
@@ -184,28 +184,28 @@ export function ProcessingModal({
         )}
 
         {/* Progress Stats */}
-        <div className='rounded-lg bg-secondary p-4'>
-          <div className='grid grid-cols-2 gap-4 text-center md:grid-cols-4'>
+        <div className='rounded-lg bg-secondary p-3 md:p-4'>
+          <div className='grid grid-cols-2 gap-3 text-center md:grid-cols-4 md:gap-4'>
             <div>
-              <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
+              <div className='text-xl font-bold text-blue-600 dark:text-blue-400 md:text-2xl'>
                 {Math.round(totalProgress)}%
               </div>
               <div className='text-xs text-muted-foreground'>Complete</div>
             </div>
             <div>
-              <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
+              <div className='text-xl font-bold text-green-600 dark:text-green-400 md:text-2xl'>
                 {formatTime(timeElapsed)}
               </div>
               <div className='text-xs text-muted-foreground'>Elapsed</div>
             </div>
             <div>
-              <div className='text-2xl font-bold text-orange-600 dark:text-orange-400'>
+              <div className='text-xl font-bold text-orange-600 dark:text-orange-400 md:text-2xl'>
                 {formatTime(estimatedTimeRemaining)}
               </div>
               <div className='text-xs text-muted-foreground'>Remaining</div>
             </div>
             <div>
-              <div className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
+              <div className='text-xl font-bold text-purple-600 dark:text-purple-400 md:text-2xl'>
                 {extractedSkills.resume.length + extractedSkills.job.length}
               </div>
               <div className='text-xs text-muted-foreground'>Skills Found</div>
@@ -215,10 +215,12 @@ export function ProcessingModal({
 
         {/* Completion Message */}
         {isCompleted && (
-          <div className='mt-6 text-center'>
-            <div className='inline-flex items-center space-x-2 rounded-full bg-green-100 px-4 py-2 text-green-800 dark:bg-green-900 dark:text-green-200'>
+          <div className='mt-4 text-center md:mt-6'>
+            <div className='inline-flex items-center space-x-2 rounded-full bg-green-100 px-3 py-2 text-green-800 dark:bg-green-900 dark:text-green-200 md:px-4'>
               <div className='h-2 w-2 animate-pulse rounded-full bg-green-500' />
-              <span className='text-sm font-medium'>Analysis completed successfully!</span>
+              <span className='text-xs font-medium md:text-sm'>
+                Analysis completed successfully!
+              </span>
             </div>
           </div>
         )}

@@ -34,60 +34,111 @@ export function ProgressPipeline({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className='flex w-full items-center justify-between pb-4'>
-        {STAGE_ORDER.map((stage, index) => {
-          const isLast = index === STAGE_ORDER.length - 1
-          const stageInfo = PROCESSING_STAGES[stage]
-          const status = getStageStatus(stage)
-          const active = isStageActive(stage)
+      {/* Mobile: Vertical layout */}
+      <div className='block md:hidden'>
+        <div className='space-y-3'>
+          {STAGE_ORDER.map((stage, index) => {
+            const isLast = index === STAGE_ORDER.length - 1
+            const stageInfo = PROCESSING_STAGES[stage]
+            const status = getStageStatus(stage)
+            const active = isStageActive(stage)
 
-          return (
-            <div key={stage} className='flex min-w-0 items-center'>
-              {/* Stage */}
-              <div
-                className={cn(
-                  'flex min-w-0 flex-col items-center overflow-x-hidden',
-                  isInteractive &&
-                    onStageClick &&
-                    'cursor-pointer transition-transform hover:scale-105',
-                )}
-                onClick={() => isInteractive && onStageClick?.(stage)}
-              >
-                <StageIndicator stage={stage} status={status} size='md' className='mb-2' />
-                <div className='min-w-0 text-center'>
-                  <div
-                    className={cn(
-                      'max-w-20 truncate text-xs font-medium',
-                      active ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600',
-                      isInteractive && 'hover:text-blue-600 dark:hover:text-blue-400',
-                    )}
-                  >
-                    {stageInfo.name}
-                  </div>
-                  {status === StageStatus.IN_PROGRESS && (
-                    <div className='mt-1 text-xs text-blue-600 dark:text-blue-400'>
-                      {Math.round(stageProgress[stage])}%
-                    </div>
+            return (
+              <div key={stage} className='flex items-center space-x-3'>
+                <div
+                  className={cn(
+                    'flex items-center space-x-3',
+                    isInteractive &&
+                      onStageClick &&
+                      'cursor-pointer transition-transform hover:scale-105',
                   )}
+                  onClick={() => isInteractive && onStageClick?.(stage)}
+                >
+                  <StageIndicator stage={stage} status={status} size='sm' />
+                  <div className='min-w-0 flex-1'>
+                    <div
+                      className={cn(
+                        'truncate text-sm font-medium',
+                        active
+                          ? 'text-gray-900 dark:text-white'
+                          : 'text-gray-400 dark:text-gray-600',
+                        isInteractive && 'hover:text-blue-600 dark:hover:text-blue-400',
+                      )}
+                    >
+                      {stageInfo.name}
+                    </div>
+                    {status === StageStatus.IN_PROGRESS && (
+                      <div className='text-xs text-blue-600 dark:text-blue-400'>
+                        {Math.round(stageProgress[stage])}%
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
+            )
+          })}
+        </div>
+      </div>
 
-              {/* Arrow */}
-              {!isLast && (
-                <div className='mx-3 flex items-center'>
-                  <ChevronRight
-                    className={cn(
-                      'h-4 w-4',
-                      active
-                        ? 'text-gray-400 dark:text-gray-500'
-                        : 'text-gray-300 dark:text-gray-700',
+      {/* Desktop: Horizontal layout */}
+      <div className='hidden md:block'>
+        <div className='flex w-full items-center justify-between pb-4'>
+          {STAGE_ORDER.map((stage, index) => {
+            const isLast = index === STAGE_ORDER.length - 1
+            const stageInfo = PROCESSING_STAGES[stage]
+            const status = getStageStatus(stage)
+            const active = isStageActive(stage)
+
+            return (
+              <div key={stage} className='flex min-w-0 items-center'>
+                {/* Stage */}
+                <div
+                  className={cn(
+                    'flex min-w-0 flex-col items-center overflow-x-hidden',
+                    isInteractive &&
+                      onStageClick &&
+                      'cursor-pointer transition-transform hover:scale-105',
+                  )}
+                  onClick={() => isInteractive && onStageClick?.(stage)}
+                >
+                  <StageIndicator stage={stage} status={status} size='md' className='mb-2' />
+                  <div className='min-w-0 text-center'>
+                    <div
+                      className={cn(
+                        'max-w-20 truncate text-xs font-medium',
+                        active
+                          ? 'text-gray-900 dark:text-white'
+                          : 'text-gray-400 dark:text-gray-600',
+                        isInteractive && 'hover:text-blue-600 dark:hover:text-blue-400',
+                      )}
+                    >
+                      {stageInfo.name}
+                    </div>
+                    {status === StageStatus.IN_PROGRESS && (
+                      <div className='mt-1 text-xs text-blue-600 dark:text-blue-400'>
+                        {Math.round(stageProgress[stage])}%
+                      </div>
                     )}
-                  />
+                  </div>
                 </div>
-              )}
-            </div>
-          )
-        })}
+
+                {/* Arrow */}
+                {!isLast && (
+                  <div className='mx-3 flex items-center'>
+                    <ChevronRight
+                      className={cn(
+                        'h-4 w-4',
+                        active
+                          ? 'text-gray-400 dark:text-gray-500'
+                          : 'text-gray-300 dark:text-gray-700',
+                      )}
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       {/* Overall Progress Bar */}

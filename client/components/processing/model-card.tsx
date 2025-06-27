@@ -60,8 +60,8 @@ export function ModelCard({ model, className }: ModelCardProps) {
         className,
       )}
     >
-      <div className='mb-3 flex items-start justify-between'>
-        <div className='flex items-center space-x-2'>
+      <div className='mb-3 flex flex-wrap items-start justify-between'>
+        <div className='flex flex-wrap items-center space-x-2'>
           <div className={cn('rounded-md p-1.5', getStatusColor())}>{getModelIcon()}</div>
           <div className='min-w-0 flex-1'>
             <h4 className='truncate text-sm font-medium text-gray-900 dark:text-white'>
