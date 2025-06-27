@@ -1,6 +1,6 @@
 'use client'
 
-import { Play, Pause, Square, ChevronLeft, ChevronRight } from 'lucide-react'
+import { X, Play, Pause, Square, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   ProcessingState,
   ProcessingStage,
@@ -9,7 +9,13 @@ import {
   ProcessingMode,
   PlaybackState,
 } from '@/types/processing'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { StageIndicator } from '@/components/processing/stage-indicator'
 import { ModelCard } from '@/components/processing/model-card'
@@ -72,9 +78,12 @@ export function ProcessingModal({
               <DialogTitle className='text-lg font-semibold md:text-xl'>
                 Skill Bridge AI Analysis
               </DialogTitle>
-              <p className='text-xs text-muted-foreground md:text-sm'>
+              <DialogDescription
+                id='processing-modal-description'
+                className='text-xs text-muted-foreground md:text-sm'
+              >
                 Processing your resume and job requirements
-              </p>
+              </DialogDescription>
             </div>
           </div>
         </DialogHeader>

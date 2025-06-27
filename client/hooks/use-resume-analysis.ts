@@ -35,7 +35,7 @@ export interface UseResumeAnalysisResult {
   setThreshold: (threshold: number) => void
   analyzeResume: () => Promise<void>
   resetResults: () => void
-  setShowProcessingModal: (show: boolean) => void
+  closeProcessingModal: () => void
 
   // Demo and Interactive Controls
   startDemo: () => void
@@ -366,6 +366,54 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     }
   }, [cleanupTimers])
 
+  const closeProcessingModal = useCallback(() => {
+    // Stop any running animations and reset all animation state
+    isPausedRef.current = false
+    pausedAtRef.current = 0
+    totalPausedTimeRef.current = 0
+    actualCurrentStageRef.current = ProcessingStage.IDLE
+    apiCompletedRef.current = false
+    shouldCompleteAnimationRef.current = false
+    animationSpeedMultiplierRef.current = 1
+
+    // Cleanup all timers
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current)
+      progressTimerRef.current = null
+    }
+    if (stageTimerRef.current) {
+      clearTimeout(stageTimerRef.current)
+      stageTimerRef.current = null
+    }
+    if (stageProgressIntervalRef.current) {
+      clearInterval(stageProgressIntervalRef.current)
+      stageProgressIntervalRef.current = null
+    }
+
+    // Reset processing state to clean initial state
+    setProcessingState({
+      currentStage: ProcessingStage.IDLE,
+      stageProgress: Object.values(ProcessingStage).reduce(
+        (acc, stage) => {
+          acc[stage] = 0
+          return acc
+        },
+        {} as Record<ProcessingStage, number>,
+      ),
+      extractedSkills: { resume: [], job: [] },
+      timeElapsed: 0,
+      estimatedTimeRemaining: 0,
+      modelsInUse: [],
+      totalProgress: 0,
+      mode: ProcessingMode.ANALYSIS,
+      playbackState: PlaybackState.STOPPED,
+      isInteractive: false,
+    })
+
+    // Close the modal
+    setShowProcessingModal(false)
+  }, [])
+
   const analyzeResume = useCallback(async () => {
     if (!resumeText.trim() || !jobDescriptionText.trim()) {
       toast({
@@ -414,7 +462,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
       // Auto-close modal after a brief delay
       setTimeout(() => {
-        setShowProcessingModal(false)
+        closeProcessingModal()
       }, 2000)
     } catch (error) {
       console.error('Error analyzing resume:', error)
@@ -435,11 +483,18 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
         variant: 'destructive',
       })
 
-      setShowProcessingModal(false)
+      closeProcessingModal()
     } finally {
       setIsProcessing(false)
     }
-  }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing])
+  }, [
+    resumeText,
+    jobDescriptionText,
+    threshold,
+    resetResults,
+    simulateProcessing,
+    closeProcessingModal,
+  ])
 
   // Demo and Interactive Controls
   const startDemo = useCallback(() => {
@@ -505,10 +560,14 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   }, [])
 
   const stopAnimation = useCallback(() => {
+    // Use the same logic as closeProcessingModal but keep modal open
     isPausedRef.current = false
     pausedAtRef.current = 0
     totalPausedTimeRef.current = 0
     actualCurrentStageRef.current = ProcessingStage.IDLE
+    apiCompletedRef.current = false
+    shouldCompleteAnimationRef.current = false
+    animationSpeedMultiplierRef.current = 1
 
     // Cleanup timers
     if (progressTimerRef.current) {
@@ -596,7 +655,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     setThreshold,
     analyzeResume,
     resetResults,
-    setShowProcessingModal,
+    closeProcessingModal,
     startDemo,
     pauseAnimation,
     resumeAnimation,
