@@ -87,6 +87,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   const pausedAtRef = useRef<number>(0)
   const totalPausedTimeRef = useRef<number>(0)
   const actualCurrentStageRef = useRef<ProcessingStage>(ProcessingStage.IDLE)
+  const apiCompletedRef = useRef<boolean>(false)
+  const shouldCompleteAnimationRef = useRef<boolean>(false)
+  const animationSpeedMultiplierRef = useRef<number>(1)
 
   const resetResults = useCallback(() => {
     setSkillData(null)
@@ -98,6 +101,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     pausedAtRef.current = 0
     totalPausedTimeRef.current = 0
     actualCurrentStageRef.current = ProcessingStage.IDLE
+    apiCompletedRef.current = false
+    shouldCompleteAnimationRef.current = false
+    animationSpeedMultiplierRef.current = 1
 
     // Cleanup timers
     if (progressTimerRef.current) {
@@ -187,7 +193,8 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   const simulateStageProgress = useCallback(
     async (stage: ProcessingStage, stageIndex: number) => {
       const stageInfo = PROCESSING_STAGES[stage]
-      const duration = stageInfo.estimatedDuration
+      const baseDuration = stageInfo.estimatedDuration
+      const adjustedDuration = baseDuration / animationSpeedMultiplierRef.current
 
       // Update the actual current stage reference
       actualCurrentStageRef.current = stage
@@ -202,8 +209,8 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       }))
 
       // Simulate progress over the duration
-      const updateInterval = 100 // Update every 100ms
-      const totalUpdates = duration / updateInterval
+      const updateInterval = 50 // Update every 50ms for smoother animation
+      const totalUpdates = adjustedDuration / updateInterval
       let currentUpdate = 0
 
       return new Promise<void>((resolve) => {
@@ -211,6 +218,12 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
           // Check if paused
           if (isPausedRef.current) {
             return // Skip this update cycle but keep the interval running
+          }
+
+          // Check if we should complete the animation early
+          if (shouldCompleteAnimationRef.current) {
+            // Speed up to complete this stage quickly
+            currentUpdate = Math.max(currentUpdate, totalUpdates * 0.9)
           }
 
           currentUpdate++
@@ -277,7 +290,12 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     startTimeRef.current = Date.now()
     totalPausedTimeRef.current = 0
     actualCurrentStageRef.current = ProcessingStage.DATA_RECEPTION
+    apiCompletedRef.current = false
+    shouldCompleteAnimationRef.current = false
+    animationSpeedMultiplierRef.current = 1
+
     const totalEstimatedTime = getTotalEstimatedTime()
+    const minAnimationTime = 8000 // Minimum 8 seconds for a good UX
 
     setProcessingState((prev) => ({
       ...prev,
@@ -292,10 +310,28 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       }
 
       const elapsed = Date.now() - startTimeRef.current - totalPausedTimeRef.current
+
+      // If API completed and we've run for minimum time, start completing animation
+      if (apiCompletedRef.current && elapsed >= minAnimationTime) {
+        shouldCompleteAnimationRef.current = true
+      }
+
+      // Dynamic time estimation based on whether API completed
+      let estimatedRemaining
+      if (apiCompletedRef.current) {
+        // If API is done, show minimal remaining time
+        estimatedRemaining = shouldCompleteAnimationRef.current
+          ? 2000
+          : Math.max(2000, minAnimationTime - elapsed)
+      } else {
+        // If API is still running, show original estimate
+        estimatedRemaining = Math.max(0, totalEstimatedTime - elapsed)
+      }
+
       setProcessingState((prev) => ({
         ...prev,
         timeElapsed: elapsed,
-        estimatedTimeRemaining: Math.max(0, totalEstimatedTime - elapsed),
+        estimatedTimeRemaining: estimatedRemaining,
       }))
     }, 1000)
 
@@ -308,6 +344,12 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
       const stage = STAGE_ORDER[i]
       await simulateStageProgress(stage, i)
+
+      // If we should complete early and we're past the minimum stages, break
+      if (shouldCompleteAnimationRef.current && i >= 2) {
+        // Allow at least 3 stages to show
+        break
+      }
     }
 
     // Clean up timer
@@ -344,7 +386,13 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
       // Start the actual API call
       const apiStartTime = performance.now()
-      const apiPromise = getSkillBridgeData(resumeText, jobDescriptionText, threshold)
+      const apiPromise = getSkillBridgeData(resumeText, jobDescriptionText, threshold).then(
+        (response) => {
+          // Mark API as completed when it finishes
+          apiCompletedRef.current = true
+          return response
+        },
+      )
 
       // Wait for both to complete
       const [, response] = await Promise.all([simulationPromise, apiPromise])
