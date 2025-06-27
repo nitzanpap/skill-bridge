@@ -3,6 +3,7 @@
 import { AppHeader } from './components/app-header'
 import { ResumeAnalysisForm } from './components/resume-analysis-form'
 import { AnalysisResults } from './components/analysis-results'
+import { ProcessingModal } from '@/components/processing'
 import { useResumeAnalysis } from '@/hooks/use-resume-analysis'
 
 export default function Home() {
@@ -18,6 +19,13 @@ export default function Home() {
           <AnalysisResults analysis={analysis} />
         </div>
       </main>
+
+      {/* Processing Modal */}
+      <ProcessingModal
+        isOpen={analysis.showProcessingModal}
+        onClose={() => analysis.setShowProcessingModal(false)}
+        processingState={analysis.processingState}
+      />
     </div>
   )
 }
