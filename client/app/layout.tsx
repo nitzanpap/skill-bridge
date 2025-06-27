@@ -5,6 +5,9 @@ import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { ServerStatusChecker } from '@/components/server-status-checker'
+import { Analytics } from '@vercel/analytics/react'
+import { appConfig } from '@/configs/config'
+import { NodeEnvs } from '@/types/config'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -53,6 +56,10 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
+        <Analytics
+          mode={appConfig.nodeEnv === NodeEnvs.PRODUCTION ? 'production' : 'development'}
+          debug={appConfig.nodeEnv !== NodeEnvs.PRODUCTION}
+        />
       </body>
     </html>
   )
