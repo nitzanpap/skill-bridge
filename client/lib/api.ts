@@ -62,6 +62,9 @@ export const checkServerReadiness = async (): Promise<boolean> => {
   try {
     const response = await fetchWithTimeout(`${API_BASE_URL}/readyz`, {
       method: 'GET',
+      headers: {
+        'ngrok-skip-browser-warning': 'true', // Skip ngrok browser warning, if applicable
+      },
     })
 
     if (!response.ok) {
