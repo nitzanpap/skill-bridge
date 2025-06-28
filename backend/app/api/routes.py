@@ -2,12 +2,16 @@
 API routes for the Skill Bridge application.
 """
 
+import logging
 from fastapi import APIRouter, HTTPException
+
+logger = logging.getLogger(__name__)
 
 from ..models.schemas import (
     CourseRecommendationRequest,
     CourseRecommendationResponse,
 )
+from ..services.cache_service import CacheService
 from ..services.nlp_service import NLPService
 from ..services.rag_service import RAGService
 from ..services.similarity_service import SimilarityService
@@ -20,16 +24,31 @@ router = APIRouter()
 async def recommend_courses(request: CourseRecommendationRequest):
     """
     Recommend courses based on skill gap between resume and job description.
+    Now with disk-based caching for identical requests.
 
     This endpoint performs:
-    1. Named entity extraction to identify skills in both the resume and job description
-    2. Calculation of the skill gap between the two
-    3. Retrieval of relevant course data using vector similarity search
-    4. LLM-based generation of course recommendations tailored to the skill gap
-    5. Processing of LLM outputs to provide structured course recommendations with URLs
-    6. Returns detailed skill matching information with similarity scores
+    1. Check cache for existing results
+    2. Named entity extraction to identify skills in both the resume and job description
+    3. Calculation of the skill gap between the two
+    4. Retrieval of relevant course data using vector similarity search
+    5. LLM-based generation of course recommendations tailored to the skill gap
+    6. Processing of LLM outputs to provide structured course recommendations with URLs
+    7. Cache results for future identical requests
+    8. Returns detailed skill matching information with similarity scores
     """
     try:
+        # Check cache first for existing results
+        cached_result = CacheService.get_course_recommendation(
+            request.resume_text, request.job_description_text, request.threshold
+        )
+
+        if cached_result:
+            # Return cached result directly
+            logger.info("Request: Returning cached course recommendations.")
+            return CourseRecommendationResponse(**cached_result)
+
+        logger.info("Request: No cache hit, processing request...")
+
         # First get the skill comparison using the NLP service
         skill_comparison = NLPService.compare_skills_semantic(
             request.resume_text,
@@ -85,15 +104,28 @@ async def recommend_courses(request: CourseRecommendationRequest):
                 0, enhanced_score_result["score"] - original_score
             )
 
-        # Convert the recommendations to the response model
-        return CourseRecommendationResponse(
-            recommended_courses=recommendations["recommended_courses"],
-            skill_gap=recommendations["skill_gap"],
-            job_skills=recommendations["job_skills"],
-            user_skills=recommendations["user_skills"],
-            recommendations_text=recommendations["recommendations_text"],
-            matching_details=skill_comparison["matching_details"],
+        # Prepare response data
+        response_data = {
+            "recommended_courses": recommendations["recommended_courses"],
+            "skill_gap": recommendations["skill_gap"],
+            "job_skills": recommendations["job_skills"],
+            "user_skills": recommendations["user_skills"],
+            "recommendations_text": recommendations["recommendations_text"],
+            "matching_details": skill_comparison["matching_details"],
+        }
+
+        # Cache the result for future requests
+        logger.info("Request: Caching result for future requests...")
+        cache_success = CacheService.set_course_recommendation(
+            request.resume_text,
+            request.job_description_text,
+            request.threshold,
+            response_data,
         )
+        logger.info(f"Request: Cache storage success: {cache_success}")
+
+        # Convert the recommendations to the response model
+        return CourseRecommendationResponse(**response_data)
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Error generating course recommendations: {str(e)}"
