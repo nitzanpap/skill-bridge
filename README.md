@@ -4,6 +4,8 @@
 
 - All models themselves, and ML flow (including NLP, RAG, and similarity logic) were written by [Ran Sela](https://github.com/RanSela-033), [Bar Muller](https://github.com/Barm2), and [Bar Redel]().
 
+See the original jupiter notebooks for the models [in this repository](https://github.com/RanSela-033/Skill-Bridge_AI_tool).
+
 - Full-stack development, UI/UX, and DevOps were made by [Nitzan Papini](https://github.com/nitzanpap).
 
 ## Description
