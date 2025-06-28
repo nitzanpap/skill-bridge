@@ -46,9 +46,10 @@ export function AppHeader() {
             <Image
               src={logoImage}
               alt='Skill Bridge Logo'
-              width={220}
-              height={220}
-              className='ml-2'
+              width={0}
+              height={0}
+              className='ml-2 h-auto max-h-[100px] w-auto'
+              priority
             />
           )}
         </div>
