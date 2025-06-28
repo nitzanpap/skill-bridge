@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { DualTextInput } from './text-input'
-import { ThresholdSlider } from './threshold-slider'
+// import { ThresholdSlider } from './threshold-slider'
 import { SampleTexts } from './sample-texts'
 import { sampleTexts, SampleTextKey } from '@/lib/constants'
 import { UseResumeAnalysisResult } from '@/hooks/use-resume-analysis'
@@ -27,7 +27,7 @@ export function ResumeAnalysisForm({ analysis }: ResumeAnalysisFormProps) {
     processingStatus,
     setResumeText,
     setJobDescriptionText,
-    setThreshold,
+    // setThreshold,
     analyzeResume,
   } = analysis
 
@@ -60,7 +60,7 @@ export function ResumeAnalysisForm({ analysis }: ResumeAnalysisFormProps) {
           />
 
           <div className='grid gap-4'>
-            <ThresholdSlider threshold={threshold} onThresholdChange={setThreshold} />
+            {/* <ThresholdSlider threshold={threshold} onThresholdChange={setThreshold} /> */}
             <SampleTexts onSampleSelection={handleSampleSelection} />
           </div>
         </div>

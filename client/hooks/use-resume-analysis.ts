@@ -210,7 +210,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
       // Simulate progress over the duration
       const updateInterval = 50 // Update every 50ms for smoother animation
-      const totalUpdates = adjustedDuration / updateInterval
+      let totalUpdates = adjustedDuration / updateInterval
       let currentUpdate = 0
 
       return new Promise<void>((resolve) => {
@@ -222,8 +222,11 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
           // Check if we should complete the animation early
           if (shouldCompleteAnimationRef.current) {
-            // Speed up to complete this stage quickly
-            currentUpdate = Math.max(currentUpdate, totalUpdates * 0.9)
+            // Speed up dramatically - complete in next few updates
+            const remainingUpdates = Math.max(1, Math.floor(totalUpdates * 0.05)) // Complete in 5% of remaining time
+            if (currentUpdate < totalUpdates - remainingUpdates) {
+              currentUpdate = totalUpdates - remainingUpdates
+            }
           }
 
           currentUpdate++
@@ -295,7 +298,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     animationSpeedMultiplierRef.current = 1
 
     const totalEstimatedTime = getTotalEstimatedTime()
-    const minAnimationTime = 8000 // Minimum 8 seconds for a good UX
+    const minAnimationTime = 3000 // Reduced to 3 seconds minimum for faster completion
 
     setProcessingState((prev) => ({
       ...prev,
@@ -311,7 +314,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
       const elapsed = Date.now() - startTimeRef.current - totalPausedTimeRef.current
 
-      // If API completed and we've run for minimum time, start completing animation
+      // If API completed and we've run for minimum time, start completing animation immediately
       if (apiCompletedRef.current && elapsed >= minAnimationTime) {
         shouldCompleteAnimationRef.current = true
       }
@@ -319,10 +322,8 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       // Dynamic time estimation based on whether API completed
       let estimatedRemaining
       if (apiCompletedRef.current) {
-        // If API is done, show minimal remaining time
-        estimatedRemaining = shouldCompleteAnimationRef.current
-          ? 2000
-          : Math.max(2000, minAnimationTime - elapsed)
+        // If API is done, show very minimal remaining time for fast completion
+        estimatedRemaining = shouldCompleteAnimationRef.current ? 500 : 1000
       } else {
         // If API is still running, show original estimate
         estimatedRemaining = Math.max(0, totalEstimatedTime - elapsed)
@@ -345,9 +346,24 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       const stage = STAGE_ORDER[i]
       await simulateStageProgress(stage, i)
 
-      // If we should complete early and we're past the minimum stages, break
-      if (shouldCompleteAnimationRef.current && i >= 2) {
-        // Allow at least 3 stages to show
+      // If API completed and we should complete fast, skip remaining stages after showing at least 2
+      if (shouldCompleteAnimationRef.current && i >= 1) {
+        // Complete all remaining stages instantly
+        for (let j = i + 1; j < STAGE_ORDER.length; j++) {
+          const remainingStage = STAGE_ORDER[j]
+          setProcessingState((prev) => {
+            const newStageProgress = { ...prev.stageProgress }
+            newStageProgress[remainingStage] = 100
+            return {
+              ...prev,
+              stageProgress: newStageProgress,
+              currentStage: remainingStage,
+              totalProgress: 100,
+            }
+          })
+          // Very brief delay to show the stage completion visually
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
         break
       }
     }
@@ -460,10 +476,10 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
         totalProgress: 100,
       }))
 
-      // Auto-close modal after a brief delay
+      // Auto-close modal after a brief delay (reduced from 2 seconds to 800ms)
       setTimeout(() => {
         closeProcessingModal()
-      }, 2000)
+      }, 800)
     } catch (error) {
       console.error('Error analyzing resume:', error)
 

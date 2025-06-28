@@ -62,36 +62,36 @@ Docker allows you to run applications in containers, making setup much easier:
 
 1. Clone the repository and navigate to the client directory:
 
-    ```bash
-    git clone https://github.com/yourusername/skill-bridge.git
-    cd skill-bridge
-    ```
+   ```bash
+   git clone https://github.com/yourusername/skill-bridge.git
+   cd skill-bridge
+   ```
 
 2. Using Docker Compose (recommended):
 
-    ```bash
-    # Build and start both frontend and backend
-    docker-compose up -d
+   ```bash
+   # Build and start both frontend and backend
+   docker-compose up -d
 
-    # To rebuild containers after making changes
-    docker-compose up -d --build
-    ```
+   # To rebuild containers after making changes
+   docker-compose up -d --build
+   ```
 
-    The application will be available at <http://localhost:3000>
+   The application will be available at <http://localhost:3000>
 
 3. Or to build and run just the frontend:
 
-    ```bash
-    # Build the Docker image
-    cd client
-    docker build -t skillbridge-frontend .
+   ```bash
+   # Build the Docker image
+   cd client
+   docker build -t skillbridge-frontend .
 
-    # Run the Docker container
-    docker run -p 3000:3000 -e NEXT_PUBLIC_API_URL=http://host.docker.internal:8000 skillbridge-frontend
-    ```
+   # Run the Docker container
+   docker run -p 3000:3000 -e NEXT_PUBLIC_API_URL=http://host.docker.internal:8000 skillbridge-frontend
+   ```
 
-    Note: When running just the frontend container, you'll need to ensure the backend is accessible and
-    add the `--add-host=host.docker.internal:host-gateway` flag on Linux.
+   Note: When running just the frontend container, you'll need to ensure the backend is accessible
+   and add the `--add-host=host.docker.internal:host-gateway` flag on Linux.
 
 ## Usage
 
@@ -168,7 +168,7 @@ The client includes an automatic fallback mechanism that:
 
 1. First attempts to connect to the primary backend via Next.js rewrites (keeping URLs hidden)
 2. If the primary backend fails with a server error (500+) or is unreachable, automatically switches
-   to the backup backend via Next.js backup rewrites  
+   to the backup backend via Next.js backup rewrites
 3. All backend URLs remain hidden from the client - users only see your Next.js domain
 4. Logs the fallback activity for monitoring and debugging purposes
 
@@ -204,8 +204,10 @@ Themes are implemented using CSS variables and persistent storage to remember us
 The application is optimized for deployment on Vercel. Key considerations:
 
 1. **Function Timeouts**: API routes are configured with appropriate timeouts for Vercel's limits
-2. **Environment Variables**: Set your `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_BACKUP_API_URL` in Vercel's dashboard
-3. **Build Configuration**: The `vercel.json` file configures function timeouts and other deployment settings
+2. **Environment Variables**: Set your `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_BACKUP_API_URL` in
+   Vercel's dashboard
+3. **Build Configuration**: The `vercel.json` file configures function timeouts and other deployment
+   settings
 
 ### Environment Setup for Production
 
