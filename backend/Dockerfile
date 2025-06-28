@@ -38,4 +38,4 @@ EXPOSE ${PORT:-8000}
 
 # Command to run the application
 # Let the application use the PORT from .env through config.py
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT:-8000}"]
+CMD ["sh", "-c", "uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
