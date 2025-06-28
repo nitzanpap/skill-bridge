@@ -37,4 +37,5 @@ Machine Learning: Regression, Classification, Clustering
 export type SampleTextKey = keyof typeof sampleTexts
 
 // Repository information
-export const GITHUB_REPOSITORY_URL = 'https://github.com/nitzanpap/skill-bridge'
+// export const GITHUB_REPOSITORY_URL = 'https://github.com/nitzanpap/skill-bridge'
+export const GITHUB_REPOSITORY_URL = 'https://github.com/RanSela-033/Skill-Bridge_AI_tool'
