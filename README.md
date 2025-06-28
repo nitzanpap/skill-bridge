@@ -164,3 +164,9 @@ This project directly addresses workforce development challenges by:
 - Reducing skill mismatches in the job market
 - Empowering users with actionable insights for professional development
 - Quantifying potential improvements in job match scores through recommended courses
+
+## Credits
+
+- All models themselves, and ML flow (including NLP, RAG, and similarity logic) were written by [Ran Sela](https://github.com/RanSela-033), [Bar Muller](https://github.com/Barm2), and [Bar Redel]().
+
+- Full-stack development, UI/UX, and DevOps were made by [Nitzan Papini](https://github.com/nitzanpap).
