@@ -197,6 +197,25 @@ Themes are implemented using CSS variables and persistent storage to remember us
 - Shadcn UI for component library
 - TypeScript for type safety
 
+## Deployment
+
+### Vercel Deployment
+
+The application is optimized for deployment on Vercel. Key considerations:
+
+1. **Function Timeouts**: API routes are configured with appropriate timeouts for Vercel's limits
+2. **Environment Variables**: Set your `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_BACKUP_API_URL` in Vercel's dashboard
+3. **Build Configuration**: The `vercel.json` file configures function timeouts and other deployment settings
+
+### Environment Setup for Production
+
+1. Go to your Vercel project dashboard
+2. Navigate to Settings → Environment Variables
+3. Add the following variables:
+   - `NEXT_PUBLIC_API_URL`: Your primary backend URL
+   - `NEXT_PUBLIC_BACKUP_API_URL`: Your backup backend URL (optional)
+   - `NODE_ENV`: `production`
+
 ## Troubleshooting
 
 ### Common Issues and Solutions
@@ -228,6 +247,12 @@ Themes are implemented using CSS variables and persistent storage to remember us
    - Ensure backend server is running
    - Check your .env.local file has the correct NEXT_PUBLIC_API_URL value
    - Verify network connectivity between frontend and backend
+
+2. **Function timeout errors on Vercel deployment**:
+   - Vercel has different timeout limits: Free (10s), Pro (60s), Enterprise (900s)
+   - Ensure your backend responds within these limits
+   - Check `vercel.json` configuration for function timeout settings
+   - Consider optimizing backend performance for slower requests
 
 ### Getting Help
 

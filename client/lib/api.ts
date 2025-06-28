@@ -10,8 +10,8 @@ const API_BASE_URL = isClient
   : appConfig.backendUrl || 'http://localhost:8000'
 const API_PREFIX = '/api/v1'
 
-// Default timeout for API requests (in milliseconds) set to 6 minutes
-const DEFAULT_TIMEOUT = 360000
+// Default timeout for API requests (in milliseconds) - 45 seconds for Vercel compatibility
+const DEFAULT_TIMEOUT = 45000
 
 if (appConfig.nodeEnv === NodeEnvs.LOCAL) {
   // Only log detailed API configuration in local development

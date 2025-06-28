@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "app/api/v1/recommend-courses/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/health/route.ts": {
+      "maxDuration": 10
+    }
+  }
+}

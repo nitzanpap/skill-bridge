@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const fetchWithFallback = async (
   endpoint: string,
   options: RequestInit,
-  timeoutMs: number = 360000,
+  timeoutMs: number = 50000, // 50 seconds - under Vercel's 60s limit
 ): Promise<Response> => {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
