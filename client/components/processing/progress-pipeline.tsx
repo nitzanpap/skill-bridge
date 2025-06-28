@@ -147,9 +147,6 @@ export function ProgressPipeline({
           <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
             Overall Progress
           </span>
-          <span className='text-sm text-gray-500 dark:text-gray-400'>
-            {STAGE_ORDER.indexOf(currentStage) + 1} of {STAGE_ORDER.length} stages
-          </span>
         </div>
         <div className='h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700'>
           <div

@@ -115,15 +115,6 @@ export function ProcessingModal({
           </div>
         </div>
 
-        {/* Stage Visualization */}
-        <div className='mb-6 md:mb-8'>
-          <StageVisualization
-            stage={currentStage}
-            progress={processingState.stageProgress[currentStage]}
-            extractedSkills={extractedSkills}
-          />
-        </div>
-
         {/* Interactive Controls - Only show in demo mode */}
         {mode === ProcessingMode.DEMO && isInteractive && (
           <div className='mb-4 md:mb-6'>
@@ -174,20 +165,6 @@ export function ProcessingModal({
                   Demo Mode
                 </span>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Models in Use */}
-        {modelsInUse.length > 0 && (
-          <div className='mb-4 md:mb-6'>
-            <h4 className='mb-3 text-xs font-medium text-muted-foreground md:text-sm'>
-              AI Models in Use:
-            </h4>
-            <div className='grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-3'>
-              {modelsInUse.map((model, index) => (
-                <ModelCard key={index} model={model} />
-              ))}
             </div>
           </div>
         )}
