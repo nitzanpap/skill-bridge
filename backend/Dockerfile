@@ -32,10 +32,10 @@ RUN uv sync
 # Copy application code
 COPY . .
 
-# Expose port 8000 as a default
+# Expose port PORT, or 8000 as a default
 # The actual port used will be determined by the application reading from .env
-EXPOSE 8000
+EXPOSE ${PORT:-8000}
 
 # Command to run the application
 # Let the application use the PORT from .env through config.py
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT:-8000}"]
