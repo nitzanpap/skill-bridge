@@ -444,73 +444,67 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     resetResults()
     setProcessingStatus('Starting analysis...')
 
-    try {
-      // Start the animation simulation
-      const simulationPromise = simulateProcessing()
+    // Start animation simulation (this can be interrupted by closing modal)
+    const simulationPromise = simulateProcessing()
 
-      // Start the actual API call
-      const apiStartTime = performance.now()
-      const apiPromise = getSkillBridgeData(resumeText, jobDescriptionText, threshold).then(
-        (response) => {
-          // Mark API as completed when it finishes
-          apiCompletedRef.current = true
-          return response
-        },
-      )
+    // Start API call (this runs independently of modal state)
+    const apiStartTime = performance.now()
+    const apiPromise = getSkillBridgeData(resumeText, jobDescriptionText, threshold)
+      .then((response) => {
+        // Mark API as completed when it finishes
+        apiCompletedRef.current = true
 
-      // Wait for both to complete
-      const [, response] = await Promise.all([simulationPromise, apiPromise])
+        // Process and store the data regardless of modal state
+        const skillComparisonData = extractSkillComparisonData(response)
+        const apiEndTime = performance.now()
 
-      const skillComparisonData = extractSkillComparisonData(response)
+        setSkillData(skillComparisonData)
+        setRecommendationData(response)
+        setProcessingStatus(`Analysis completed in ${Math.round(apiEndTime - apiStartTime)}ms.`)
 
-      const apiEndTime = performance.now()
-      setProcessingStatus(`Analysis completed in ${Math.round(apiEndTime - apiStartTime)}ms.`)
+        // Set final processing state
+        setProcessingState((prev) => ({
+          ...prev,
+          currentStage: ProcessingStage.COMPLETED,
+          totalProgress: 100,
+        }))
 
-      setSkillData(skillComparisonData)
-      setRecommendationData(response)
+        return response
+      })
+      .catch((error) => {
+        console.error('Error analyzing resume:', error)
 
-      // Set final state
-      setProcessingState((prev) => ({
-        ...prev,
-        currentStage: ProcessingStage.COMPLETED,
-        totalProgress: 100,
-      }))
+        // Update processing state to show error
+        setProcessingState((prev) => ({
+          ...prev,
+          modelsInUse: prev.modelsInUse.map((model) => ({
+            ...model,
+            status: StageStatus.FAILED,
+          })),
+        }))
 
-      // Auto-close modal after a brief delay (reduced from 2 seconds to 800ms)
-      setTimeout(() => {
-        closeProcessingModal()
-      }, 800)
-    } catch (error) {
-      console.error('Error analyzing resume:', error)
+        toast({
+          title: 'Analysis Failed',
+          description:
+            "We couldn't analyze your resume against the job requirements. Please try again later.",
+          variant: 'destructive',
+        })
 
-      // Update processing state to show error
-      setProcessingState((prev) => ({
-        ...prev,
-        modelsInUse: prev.modelsInUse.map((model) => ({
-          ...model,
-          status: StageStatus.FAILED,
-        })),
-      }))
-
-      toast({
-        title: 'Analysis Failed',
-        description:
-          "We couldn't analyze your resume against the job requirements. Please try again later.",
-        variant: 'destructive',
+        throw error
+      })
+      .finally(() => {
+        // Always clear the processing state regardless of success/failure
+        setIsProcessing(false)
       })
 
-      closeProcessingModal()
-    } finally {
-      setIsProcessing(false)
+    // Run both promises but handle them independently
+    try {
+      await Promise.allSettled([simulationPromise, apiPromise])
+    } catch (error) {
+      // Error handling is already done in the apiPromise catch block
+      // This is just to prevent unhandled promise rejection
     }
-  }, [
-    resumeText,
-    jobDescriptionText,
-    threshold,
-    resetResults,
-    simulateProcessing,
-    closeProcessingModal,
-  ])
+  }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing])
 
   // Demo and Interactive Controls
   const startDemo = useCallback(() => {
@@ -655,6 +649,18 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       }
     })
   }, [])
+
+  // Automatically close modal when analysis completes (if modal is still open)
+  useEffect(() => {
+    if (!isProcessing && skillData && showProcessingModal) {
+      // Small delay to let users see the completion state
+      const timer = setTimeout(() => {
+        closeProcessingModal()
+      }, 1000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [isProcessing, skillData, showProcessingModal, closeProcessingModal])
 
   return {
     resumeText,
