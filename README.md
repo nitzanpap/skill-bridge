@@ -1,5 +1,11 @@
 # Skill Bridge
 
+## Credits
+
+- All models themselves, and ML flow (including NLP, RAG, and similarity logic) were written by [Ran Sela](https://github.com/RanSela-033), [Bar Muller](https://github.com/Barm2), and [Bar Redel]().
+
+- Full-stack development, UI/UX, and DevOps were made by [Nitzan Papini](https://github.com/nitzanpap).
+
 ## Description
 
 🎯 Skill Bridge is a recommendation engine that identifies skill gaps between job seekers and job requirements, then suggests targeted upskilling courses to improve job match scores. By bridging the gap between user skills and job requirements, we help candidates become more competitive for their desired positions.
@@ -164,9 +170,3 @@ This project directly addresses workforce development challenges by:
 - Reducing skill mismatches in the job market
 - Empowering users with actionable insights for professional development
 - Quantifying potential improvements in job match scores through recommended courses
-
-## Credits
-
-- All models themselves, and ML flow (including NLP, RAG, and similarity logic) were written by [Ran Sela](https://github.com/RanSela-033), [Bar Muller](https://github.com/Barm2), and [Bar Redel]().
-
-- Full-stack development, UI/UX, and DevOps were made by [Nitzan Papini](https://github.com/nitzanpap).
