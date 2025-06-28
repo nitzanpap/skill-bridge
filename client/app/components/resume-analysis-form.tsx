@@ -81,10 +81,6 @@ export function ResumeAnalysisForm({ analysis }: ResumeAnalysisFormProps) {
               'Analyze Resume'
             )}
           </Button>
-
-          <Button variant='outline' onClick={analysis.startDemoAnalysis} disabled={isProcessing}>
-            🎬 Understand Analysis
-          </Button>
         </div>
 
         {isProcessing && processingStatus && (
