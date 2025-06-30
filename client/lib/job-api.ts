@@ -1,5 +1,4 @@
 import { appConfig } from '@/configs/config'
-import { NodeEnvs } from '@/types/config'
 
 // Types for job API
 export enum JobStatus {

@@ -4,14 +4,14 @@ Job Queue Service for managing async job processing.
 
 import asyncio
 import logging
+import threading
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
+
 import numpy as np
-import threading
 
 from ..models.job_models import Job, JobStatus, JobType
-from ..models.schemas import CourseRecommendationRequest, CourseRecommendationResponse
 from ..services.cache_service import CacheService
 from ..services.nlp_service import NLPService
 from ..services.rag_service import RAGService

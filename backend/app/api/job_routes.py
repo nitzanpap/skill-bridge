@@ -10,7 +10,6 @@ from ..models.job_models import (
     JobSubmitRequest,
     JobSubmitResponse,
     JobStatusResponse,
-    JobStatus,
     JobType,
 )
 from ..services.job_queue_service import JobQueueService
@@ -121,10 +120,6 @@ async def get_job_status(job_id: str):
             started_at=job.started_at,
             completed_at=job.completed_at
         )
-        
-        # Debug: Log response size and content type for troubleshooting proxy issues
-        if job.result:
-            logger.info(f"Job {job_id} response has result of type {type(job.result)} with keys {list(job.result.keys()) if isinstance(job.result, dict) else 'N/A'}")
         
         return response
         
