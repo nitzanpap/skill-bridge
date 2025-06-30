@@ -11,7 +11,7 @@ import {
   JobStatus,
   JobStatusResponse,
 } from '@/lib/job-api'
-import { toast } from '@/components/ui/use-toast'
+import { useToast } from '@/hooks/use-toast'
 import {
   ProcessingStage,
   ProcessingState,
@@ -54,6 +54,7 @@ export interface UseResumeAnalysisResult {
 }
 
 export function useResumeAnalysis(): UseResumeAnalysisResult {
+  const { toast } = useToast()
   const [resumeText, setResumeText] = useState('')
   const [jobDescriptionText, setJobDescriptionText] = useState('')
   const [threshold, setThreshold] = useState(0.5)
@@ -515,7 +516,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
         return response
       })
       .catch((error) => {
-        console.error('Error analyzing resume:', error)
+        console.error('Error analyzing resume after all retries:', error)
 
         // Only show error if not cancelled by user
         if (!error.message?.includes('cancelled')) {
@@ -528,13 +529,18 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
             })),
           }))
 
-          toast({
-            title: 'Analysis Failed',
-            description:
-              error.message || "We couldn't analyze your resume against the job requirements. Please try again later.",
-            variant: 'destructive',
-          })
+        toast({
+          title: 'Sorry! something went wrong :(',
+          description:
+            "We're having some trouble processing your request right now. Please try again later!",
+          variant: 'destructive',
+        })
         }
+
+        // Close the modal after showing the error
+        setTimeout(() => {
+          closeProcessingModal()
+        }, 500) // Small delay to ensure toast is visible
 
         throw error
       })
@@ -551,7 +557,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       // Error handling is already done in the apiPromise catch block
       // This is just to prevent unhandled promise rejection
     }
-  }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing])
+  }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing, toast])
 
   // Demo and Interactive Controls
   const startDemo = useCallback(() => {
