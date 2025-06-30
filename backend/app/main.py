@@ -2,17 +2,51 @@
 Main entrypoint for the API.
 """
 
+import asyncio
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.routes import router
 from .core.config import ALLOWED_ORIGINS, API_V1_STR, PORT, PROJECT_NAME
+from .services.job_queue_service import JobQueueService
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Manage application lifecycle events.
+    """
+    # Startup
+    await JobQueueService.initialize()
+    await JobQueueService.start_worker()
+    
+    # Start periodic cleanup task
+    cleanup_task = asyncio.create_task(periodic_cleanup())
+    
+    yield
+    
+    # Shutdown
+    cleanup_task.cancel()
+    await JobQueueService.stop_worker()
+
+
+async def periodic_cleanup():
+    """
+    Periodically clean up old jobs from memory.
+    """
+    while True:
+        await asyncio.sleep(3600)  # Run every hour
+        await JobQueueService.cleanup_old_jobs()
+
 
 # Create FastAPI application
 app = FastAPI(
     title=PROJECT_NAME,
     description="API for custom-trained spaCy NER models",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # Configure CORS

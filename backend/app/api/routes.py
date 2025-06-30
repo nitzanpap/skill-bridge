@@ -15,9 +15,13 @@ from ..services.cache_service import CacheService
 from ..services.nlp_service import NLPService
 from ..services.rag_service import RAGService
 from ..services.similarity_service import SimilarityService
+from .job_routes import job_router
 
 # Create router instance
 router = APIRouter()
+
+# Include job routes
+router.include_router(job_router)
 
 
 @router.post("/recommend-courses", response_model=CourseRecommendationResponse)

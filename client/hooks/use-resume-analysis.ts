@@ -5,6 +5,12 @@ import {
   SkillBridgeResponse,
   SkillComparisonData,
 } from '@/lib/api'
+import {
+  submitAndWaitForJob,
+  JobType,
+  JobStatus,
+  JobStatusResponse,
+} from '@/lib/job-api'
 import { toast } from '@/components/ui/use-toast'
 import {
   ProcessingStage,
@@ -56,6 +62,9 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   const [skillData, setSkillData] = useState<SkillComparisonData | null>(null)
   const [recommendationData, setRecommendationData] = useState<SkillBridgeResponse | null>(null)
   const [showProcessingModal, setShowProcessingModal] = useState(false)
+  
+  // Ref to store abort controller for cancelling job polling
+  const jobAbortControllerRef = useRef<AbortController | null>(null)
 
   // Processing state for animations
   const [processingState, setProcessingState] = useState<ProcessingState>({
@@ -383,6 +392,12 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   }, [cleanupTimers])
 
   const closeProcessingModal = useCallback(() => {
+    // Cancel any ongoing job polling
+    if (jobAbortControllerRef.current) {
+      jobAbortControllerRef.current.abort()
+      jobAbortControllerRef.current = null
+    }
+    
     // Stop any running animations and reset all animation state
     isPausedRef.current = false
     pausedAtRef.current = 0
@@ -447,10 +462,38 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     // Start animation simulation (this can be interrupted by closing modal)
     const simulationPromise = simulateProcessing()
 
-    // Start API call (this runs independently of modal state)
+    // Start API call using job queue (this runs independently of modal state)
     const apiStartTime = performance.now()
-    const apiPromise = getSkillBridgeData(resumeText, jobDescriptionText, threshold)
-      .then((response) => {
+    const abortController = new AbortController()
+    jobAbortControllerRef.current = abortController
+    
+    const apiPromise = submitAndWaitForJob(
+      {
+        type: JobType.COURSE_RECOMMENDATION,
+        payload: {
+          resume_text: resumeText,
+          job_description_text: jobDescriptionText,
+          threshold: threshold,
+        },
+      },
+      (status: JobStatusResponse) => {
+        // Update processing status based on job status
+        if (status.status === JobStatus.QUEUED) {
+          setProcessingStatus(
+            `Job queued (position ${status.position_in_queue || 0}, ~${status.estimated_wait_seconds || 0}s wait)`
+          )
+        } else if (status.status === JobStatus.RUNNING) {
+          setProcessingStatus('Processing your request...')
+        }
+      },
+      abortController.signal
+    )
+      .then((jobResult) => {
+        if (jobResult.status === JobStatus.FAILED) {
+          throw new Error(jobResult.error || 'Job processing failed')
+        }
+        
+        const response = jobResult.result as SkillBridgeResponse
         // Mark API as completed when it finishes
         apiCompletedRef.current = true
 
@@ -474,27 +517,31 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       .catch((error) => {
         console.error('Error analyzing resume:', error)
 
-        // Update processing state to show error
-        setProcessingState((prev) => ({
-          ...prev,
-          modelsInUse: prev.modelsInUse.map((model) => ({
-            ...model,
-            status: StageStatus.FAILED,
-          })),
-        }))
+        // Only show error if not cancelled by user
+        if (!error.message?.includes('cancelled')) {
+          // Update processing state to show error
+          setProcessingState((prev) => ({
+            ...prev,
+            modelsInUse: prev.modelsInUse.map((model) => ({
+              ...model,
+              status: StageStatus.FAILED,
+            })),
+          }))
 
-        toast({
-          title: 'Analysis Failed',
-          description:
-            "We couldn't analyze your resume against the job requirements. Please try again later.",
-          variant: 'destructive',
-        })
+          toast({
+            title: 'Analysis Failed',
+            description:
+              error.message || "We couldn't analyze your resume against the job requirements. Please try again later.",
+            variant: 'destructive',
+          })
+        }
 
         throw error
       })
       .finally(() => {
         // Always clear the processing state regardless of success/failure
         setIsProcessing(false)
+        jobAbortControllerRef.current = null
       })
 
     // Run both promises but handle them independently
