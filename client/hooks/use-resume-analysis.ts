@@ -5,7 +5,7 @@ import {
   SkillBridgeResponse,
   SkillComparisonData,
 } from '@/lib/api'
-import { toast } from '@/components/ui/use-toast'
+import { useToast } from '@/hooks/use-toast'
 import {
   ProcessingStage,
   ProcessingState,
@@ -48,6 +48,7 @@ export interface UseResumeAnalysisResult {
 }
 
 export function useResumeAnalysis(): UseResumeAnalysisResult {
+  const { toast } = useToast()
   const [resumeText, setResumeText] = useState('')
   const [jobDescriptionText, setJobDescriptionText] = useState('')
   const [threshold, setThreshold] = useState(0.5)
@@ -447,9 +448,32 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     // Start animation simulation (this can be interrupted by closing modal)
     const simulationPromise = simulateProcessing()
 
-    // Start API call (this runs independently of modal state)
+    // Start API call with retry logic (this runs independently of modal state)
     const apiStartTime = performance.now()
-    const apiPromise = getSkillBridgeData(resumeText, jobDescriptionText, threshold)
+    const maxRetries = 3
+    let retryCount = 0
+
+    const attemptAPICall = async (): Promise<SkillBridgeResponse> => {
+      try {
+        const response = await getSkillBridgeData(resumeText, jobDescriptionText, threshold)
+        return response
+      } catch (error) {
+        retryCount++
+        console.error(`API attempt ${retryCount} failed:`, error)
+
+        if (retryCount < maxRetries) {
+          // Wait before retrying (exponential backoff: 1s, 2s, 4s)
+          const delay = Math.pow(2, retryCount - 1) * 1000
+          console.log(`Retrying in ${delay}ms...`)
+          await new Promise((resolve) => setTimeout(resolve, delay))
+          return attemptAPICall()
+        } else {
+          throw error
+        }
+      }
+    }
+
+    const apiPromise = attemptAPICall()
       .then((response) => {
         // Mark API as completed when it finishes
         apiCompletedRef.current = true
@@ -472,7 +496,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
         return response
       })
       .catch((error) => {
-        console.error('Error analyzing resume:', error)
+        console.error('Error analyzing resume after all retries:', error)
 
         // Update processing state to show error
         setProcessingState((prev) => ({
@@ -483,12 +507,18 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
           })),
         }))
 
+        // Show specific error message for max retries reached
         toast({
-          title: 'Analysis Failed',
+          title: 'Sorry! something went wrong :(',
           description:
-            "We couldn't analyze your resume against the job requirements. Please try again later.",
+            "We're having some trouble processing your request right now. Please try again later!",
           variant: 'destructive',
         })
+
+        // Close the modal after showing the error
+        setTimeout(() => {
+          closeProcessingModal()
+        }, 500) // Small delay to ensure toast is visible
 
         throw error
       })
@@ -504,7 +534,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       // Error handling is already done in the apiPromise catch block
       // This is just to prevent unhandled promise rejection
     }
-  }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing])
+  }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing, toast])
 
   // Demo and Interactive Controls
   const startDemo = useCallback(() => {
