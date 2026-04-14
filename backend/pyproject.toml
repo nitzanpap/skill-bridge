@@ -14,4 +14,5 @@ dependencies = [
     "sentence-transformers>=4.0.1",
     "spacy==3.7.2",
     "uvicorn>=0.34.0",
+    "pandas>=2.0.0",
 ]

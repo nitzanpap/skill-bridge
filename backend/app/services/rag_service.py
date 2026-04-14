@@ -153,14 +153,15 @@ class RAGService:
             )
 
             # Call Cohere API for LLM-generated recommendations
-            co = cohere.Client(api_key=COHERE_API_KEY)
+            co = cohere.ClientV2(api_key=COHERE_API_KEY)
             response = co.chat(
-                model="command-r-plus",
-                message=augmented_prompt,
+                model="command-r-plus-08-2024",
+                messages=[{"role": "user", "content": augmented_prompt}],
             )
 
             # Extract course recommendations from the response
-            recommended_courses = cls.extract_course_recommendations(response.text)
+            response_text = response.message.content[0].text
+            recommended_courses = cls.extract_course_recommendations(response_text)
 
             # Calculate skill gap
             skill_gap = list(job_skills.difference(user_skills))
@@ -170,7 +171,7 @@ class RAGService:
                 "skill_gap": skill_gap,
                 "job_skills": list(job_skills),
                 "user_skills": list(user_skills),
-                "recommendations_text": response.text,
+                "recommendations_text": response_text,
             }
 
         except Exception as e:

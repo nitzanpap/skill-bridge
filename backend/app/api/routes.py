@@ -123,15 +123,18 @@ async def recommend_courses(request: CourseRecommendationRequest):
             "score": skill_comparison["score"],
         }
 
-        # Cache the result for future requests
-        logger.info("Request: Caching result for future requests...")
-        cache_success = CacheService.set_course_recommendation(
-            request.resume_text,
-            request.job_description_text,
-            request.threshold,
-            response_data,
-        )
-        logger.info(f"Request: Cache storage success: {cache_success}")
+        # Only cache when course recommendations were successfully generated
+        if recommendations["recommended_courses"]:
+            logger.info("Request: Caching result for future requests...")
+            cache_success = CacheService.set_course_recommendation(
+                request.resume_text,
+                request.job_description_text,
+                request.threshold,
+                response_data,
+            )
+            logger.info(f"Request: Cache storage success: {cache_success}")
+        else:
+            logger.warning("Request: Skipping cache — course recommendations were empty")
 
         # Convert the recommendations to the response model
         return CourseRecommendationResponse(**response_data)
