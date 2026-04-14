@@ -16,7 +16,7 @@ recommendations using semantic matching technology.
 
 ## Tech Stack
 
-- **Framework**: Next.js 14+ (React 18+)
+- **Framework**: Next.js 15+ (React 19+)
 - **UI/UX**:
   - Tailwind CSS 3.x for utility-first styling
   - Shadcn UI for accessible, customizable component library
@@ -26,72 +26,46 @@ recommendations using semantic matching technology.
 - **State Management**: React Context API and Hooks
 - **API Communication**: Fetch API with custom wrapper
 - **Build & Development**:
-  - Node.js 18+ runtime
-  - npm/yarn/pnpm package management
-  - ESLint for code quality
-  - Prettier for code formatting
+  - Bun runtime and package manager
+  - Biome for linting and formatting
 - **Deployment**:
   - Vercel/Netlify for production hosting (optional)
 
 ## Requirements
 
-- Docker
+- Docker (for production/deployment)
+- Bun (for local development)
 - Modern browser with ES6+ support
 
 ## Quick Start
 
-### Prerequisites
+### Using Docker Compose (recommended)
 
-- Docker (required for deployment)
-- **Supported Platforms**: Any platform that can run Docker
+```bash
+# From the project root
+docker-compose up --build
+```
 
-> **Note**: The application is designed to run exclusively through Docker to ensure consistent
-> environments across development and production.
+The application will be available at <http://localhost:3000>
 
-#### Installing Docker
+### Local Development
 
-Docker allows you to run applications in containers, making setup much easier:
+```bash
+cd client
+bun install
+bun run dev
+```
 
-1. Download and install Docker Desktop from
-   [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
-2. Follow the installation wizard instructions for your operating system
-3. After installation, start Docker Desktop
-4. Verify installation by running `docker --version` in your terminal/command prompt
+### Running just the frontend container
 
-### Docker Setup (Only Supported Method)
+```bash
+cd client
+docker build -t skillbridge-frontend .
+docker run -p 3000:3000 -e BACKEND_URL=http://host.docker.internal:8000 skillbridge-frontend
+```
 
-1. Clone the repository and navigate to the client directory:
-
-   ```bash
-   git clone https://github.com/yourusername/skill-bridge.git
-   cd skill-bridge
-   ```
-
-2. Using Docker Compose (recommended):
-
-   ```bash
-   # Build and start both frontend and backend
-   docker-compose up -d
-
-   # To rebuild containers after making changes
-   docker-compose up -d --build
-   ```
-
-   The application will be available at <http://localhost:3000>
-
-3. Or to build and run just the frontend:
-
-   ```bash
-   # Build the Docker image
-   cd client
-   docker build -t skillbridge-frontend .
-
-   # Run the Docker container
-   docker run -p 3000:3000 -e NEXT_PUBLIC_API_URL=http://host.docker.internal:8000 skillbridge-frontend
-   ```
-
-   Note: When running just the frontend container, you'll need to ensure the backend is accessible
-   and add the `--add-host=host.docker.internal:host-gateway` flag on Linux.
+Note: When running just the frontend container, you'll need to ensure the backend is accessible
+and add the `--add-host=host.docker.internal:host-gateway` flag on Linux.
 
 ## Usage
 
@@ -128,11 +102,15 @@ client/
 │   └── layout.tsx          # Root layout component
 ├── components/             # Shared UI components
 │   └── ui/                 # Shadcn UI components
+├── configs/                # App configuration
+│   └── config.ts           # Backend URL configuration (runtime getters)
+├── hooks/                  # Custom React hooks
 ├── lib/                    # Utility functions and API client
 │   ├── api.ts              # API client for backend communication
 │   └── utils.ts            # Helper functions
 ├── styles/                 # Global styles
 ├── public/                 # Static assets
+├── biome.json              # Biome linter/formatter configuration
 ├── next.config.mjs         # Next.js configuration
 └── package.json            # Project dependencies
 ```
@@ -143,11 +121,14 @@ The application uses environment variables for configuration. Create a `.env.loc
 client directory to set up your environment:
 
 ```bash
-# Primary backend URL (required)
+# Server-side backend URL (takes priority, read at runtime)
+# In Docker Compose this is set automatically to http://backend:8000
+# BACKEND_URL=http://localhost:8000
+
+# Primary backend URL (fallback, inlined at build time for client-side code)
 NEXT_PUBLIC_API_URL=http://localhost:8000
 
 # Backup backend URL (optional)
-# Used as fallback if the primary backend fails
 NEXT_PUBLIC_BACKUP_API_URL=http://localhost:8001
 
 # Node environment
@@ -193,12 +174,20 @@ See the `api.ts` file for implementation details.
 The application supports both light and dark modes through a theme toggle in the top right corner.
 Themes are implemented using CSS variables and persistent storage to remember user preferences.
 
-## Technologies Used
+## Code Quality
 
-- Next.js for the React framework
-- Tailwind CSS for styling
-- Shadcn UI for component library
-- TypeScript for type safety
+The project uses [Biome](https://biomejs.dev/) for both linting and formatting (replacing ESLint +
+Prettier):
+
+```bash
+# Check for lint/format issues
+bun run lint
+
+# Auto-fix issues
+bun run format
+```
+
+Configuration is in `biome.json`.
 
 ## Deployment
 
@@ -206,7 +195,7 @@ Themes are implemented using CSS variables and persistent storage to remember us
 
 The application is optimized for deployment on Vercel. Key considerations:
 
-1. **Function Timeouts**: API routes are configured with appropriate timeouts for Vercel's limits
+1. **Function Timeouts**: API routes are configured with 120s timeouts for initial model loading
 2. **Environment Variables**: Set your `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_BACKUP_API_URL` in
    Vercel's dashboard
 3. **Build Configuration**: The `vercel.json` file configures function timeouts and other deployment
@@ -225,7 +214,7 @@ The application is optimized for deployment on Vercel. Key considerations:
 
 ### Common Issues and Solutions
 
-#### Node.js and npm Issues
+#### Dependency Issues
 
 1. **Module not found errors**:
 
@@ -233,31 +222,22 @@ The application is optimized for deployment on Vercel. Key considerations:
    Error: Cannot find module 'next'
    ```
 
-   - Ensure dependencies are installed: `npm install`
-   - Delete node_modules folder and package-lock.json, then run `npm install` again
+   - Ensure dependencies are installed: `bun install`
+   - Delete `node_modules` folder and `bun.lock`, then run `bun install` again
 
-2. **NVM not recognized**:
-   - Make sure NVM is installed and properly set up in your PATH
-   - Restart your terminal/command prompt after installation
-
-3. **Port conflicts with development server**:
-   - Change the port with: `npm run dev -- -p 3001`
-   - Or, for other package managers:
-     - Yarn: `yarn dev -p 3001`
-     - pnpm: `pnpm dev -p 3001`
+2. **Port conflicts with development server**:
+   - Change the port with: `bun run dev -- -p 3001`
 
 #### API Connection Issues
 
 1. **Cannot connect to backend API**:
    - Ensure backend server is running
-   - Check your .env.local file has the correct NEXT_PUBLIC_API_URL value
-   - Verify network connectivity between frontend and backend
+   - Check your `.env.local` file has the correct `NEXT_PUBLIC_API_URL` value
+   - In Docker Compose, the `BACKEND_URL` env var is set automatically
 
 2. **Function timeout errors on Vercel deployment**:
    - Vercel has different timeout limits: Free (10s), Pro (60s), Enterprise (900s)
    - Ensure your backend responds within these limits
-   - Check `vercel.json` configuration for function timeout settings
-   - Consider optimizing backend performance for slower requests
 
 ### Getting Help
 
@@ -265,4 +245,4 @@ If you encounter issues not covered here, check:
 
 1. The project's GitHub issues section
 2. Next.js documentation: <https://nextjs.org/docs>
-3. Node.js documentation: <https://nodejs.org/en/docs/>
+3. Bun documentation: <https://bun.sh/docs>

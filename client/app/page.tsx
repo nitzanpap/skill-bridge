@@ -1,10 +1,10 @@
 'use client'
 
-import { AppHeader } from './components/app-header'
-import { ResumeAnalysisForm } from './components/resume-analysis-form'
-import { AnalysisResults } from './components/analysis-results'
 import { ProcessingModal } from '@/components/processing'
 import { useResumeAnalysis } from '@/hooks/use-resume-analysis'
+import { AnalysisResults } from './components/analysis-results'
+import { AppHeader } from './components/app-header'
+import { ResumeAnalysisForm } from './components/resume-analysis-form'
 
 export default function Home() {
   const analysis = useResumeAnalysis()

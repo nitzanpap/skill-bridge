@@ -1,9 +1,14 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { ProcessingStage, StageStatus, PROCESSING_STAGES, STAGE_ORDER } from '@/types/processing'
-import { StageIndicator } from './stage-indicator'
+import {
+  PROCESSING_STAGES,
+  type ProcessingStage,
+  STAGE_ORDER,
+  StageStatus,
+} from '@/types/processing'
 import { ChevronRight } from 'lucide-react'
+import { StageIndicator } from './stage-indicator'
 
 interface ProgressPipelineProps {
   currentStage: ProcessingStage
@@ -38,7 +43,7 @@ export function ProgressPipeline({
       <div className='block md:hidden'>
         <div className='space-y-3'>
           {STAGE_ORDER.map((stage, index) => {
-            const isLast = index === STAGE_ORDER.length - 1
+            const _isLast = index === STAGE_ORDER.length - 1
             const stageInfo = PROCESSING_STAGES[stage]
             const status = getStageStatus(stage)
             const active = isStageActive(stage)

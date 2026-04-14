@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { sampleTexts, SampleTextKey } from '@/lib/constants'
+import type { SampleTextKey } from '@/lib/constants'
 
 interface SampleTextsProps {
   onSampleSelection: (sampleKey: SampleTextKey) => void

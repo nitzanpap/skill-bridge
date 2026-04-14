@@ -1,9 +1,9 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { ModelStatus, StageStatus } from '@/types/processing'
 import { Badge } from '@/components/ui/badge'
-import { Brain, Database, Zap, Search } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { type ModelStatus, StageStatus } from '@/types/processing'
+import { Brain, Database, Search, Zap } from 'lucide-react'
 
 interface ModelCardProps {
   model: ModelStatus

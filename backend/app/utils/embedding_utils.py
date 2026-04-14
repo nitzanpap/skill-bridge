@@ -2,8 +2,11 @@
 Utility functions for embedding and indexing course data.
 """
 
+import logging
 import os
 from typing import Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 import pandas as pd
 from pinecone import Pinecone, ServerlessSpec
@@ -150,16 +153,16 @@ def prepare_and_index_courses(file_path: Optional[str] = None) -> None:
         file_path: Path to the CSV file
     """
     # Load courses
-    print("Loading course data...")
+    logger.info("Loading course data...")
     courses_df = load_courses_data(file_path)
-    print(f"Loaded {len(courses_df)} courses")
+    logger.info("Loaded %d courses", len(courses_df))
 
     # Embed courses
-    print("Embedding courses...")
+    logger.info("Embedding courses...")
     records = embed_courses(courses_df)
 
     # Index courses
-    print("Indexing courses...")
+    logger.info("Indexing courses...")
     index_courses(records)
 
-    print("Course indexing completed successfully!")
+    logger.info("Course indexing completed successfully!")

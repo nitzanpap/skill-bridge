@@ -1,10 +1,10 @@
 import { appConfig } from '@/configs/config'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 // Helper function to test backend connectivity using absolute URLs
 const testBackendHealth = async (
   backendUrl: string,
-  timeoutMs: number = 5000,
+  timeoutMs = 5000,
 ): Promise<{ status: string; error?: string }> => {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
@@ -71,8 +71,8 @@ export async function GET() {
         backend: 'disconnected',
         primaryBackend: 'disconnected',
         backupBackend: 'disconnected',
-        primaryError: primaryResult.error,
-        backupError: backupResult.error,
+        primaryError: 'unavailable',
+        backupError: 'unavailable',
       },
       { status: 503 },
     )
@@ -83,7 +83,7 @@ export async function GET() {
       {
         status: 'error',
         backend: 'disconnected',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Health check failed',
       },
       { status: 503 },
     )

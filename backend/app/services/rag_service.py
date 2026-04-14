@@ -2,6 +2,7 @@
 Service for Retrieval-Augmented Generation (RAG) based course recommendations.
 """
 
+import logging
 import re
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -11,6 +12,8 @@ from sentence_transformers import SentenceTransformer
 
 from ..core.config import COHERE_API_KEY, PINECONE_API_KEY, PINECONE_INDEX_NAME
 from .nlp_service import NLPService
+
+logger = logging.getLogger(__name__)
 
 
 class RAGService:
@@ -175,15 +178,13 @@ class RAGService:
             }
 
         except Exception as e:
-            # Log the error
-            print(f"Error generating course recommendations: {str(e)}")
-            # Return a graceful failure response
+            logger.error("Error generating course recommendations: %s", e)
             return {
                 "recommended_courses": [],
                 "skill_gap": [],
                 "job_skills": [],
                 "user_skills": [],
-                "recommendations_text": f"Error generating recommendations: {str(e)}",
+                "recommendations_text": "Error generating recommendations. Please try again later.",
                 "error": str(e),
             }
 

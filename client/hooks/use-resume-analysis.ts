@@ -1,21 +1,21 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
-import {
-  getSkillBridgeData,
-  extractSkillComparisonData,
-  SkillBridgeResponse,
-  SkillComparisonData,
-} from '@/lib/api'
 import { useToast } from '@/hooks/use-toast'
 import {
-  ProcessingStage,
-  ProcessingState,
-  StageStatus,
+  type SkillBridgeResponse,
+  type SkillComparisonData,
+  extractSkillComparisonData,
+  getSkillBridgeData,
+} from '@/lib/api'
+import {
+  type ModelStatus,
   PROCESSING_STAGES,
-  STAGE_ORDER,
-  ModelStatus,
-  ProcessingMode,
   PlaybackState,
+  ProcessingMode,
+  ProcessingStage,
+  type ProcessingState,
+  STAGE_ORDER,
+  StageStatus,
 } from '@/types/processing'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export interface UseResumeAnalysisResult {
   // State
@@ -83,7 +83,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
   const stageTimerRef = useRef<NodeJS.Timeout | null>(null)
   const stageProgressIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const startTimeRef = useRef<number>(0)
-  const pausedTimeRef = useRef<number>(0)
+  const _pausedTimeRef = useRef<number>(0)
   const isPausedRef = useRef<boolean>(false)
   const pausedAtRef = useRef<number>(0)
   const totalPausedTimeRef = useRef<number>(0)
@@ -211,7 +211,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
       // Simulate progress over the duration
       const updateInterval = 50 // Update every 50ms for smoother animation
-      let totalUpdates = adjustedDuration / updateInterval
+      const totalUpdates = adjustedDuration / updateInterval
       let currentUpdate = 0
 
       return new Promise<void>((resolve) => {
@@ -463,13 +463,12 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
 
         if (retryCount < maxRetries) {
           // Wait before retrying (exponential backoff: 1s, 2s, 4s)
-          const delay = Math.pow(2, retryCount - 1) * 1000
+          const delay = 2 ** (retryCount - 1) * 1000
           console.log(`Retrying in ${delay}ms...`)
           await new Promise((resolve) => setTimeout(resolve, delay))
           return attemptAPICall()
-        } else {
-          throw error
         }
+        throw error
       }
     }
 
@@ -530,7 +529,7 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
     // Run both promises but handle them independently
     try {
       await Promise.allSettled([simulationPromise, apiPromise])
-    } catch (error) {
+    } catch (_error) {
       // Error handling is already done in the apiPromise catch block
       // This is just to prevent unhandled promise rejection
     }

@@ -1,20 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { checkServerReadiness } from '@/lib/api'
+import { useEffect, useState } from 'react'
 
 export function ServerStatusChecker() {
   const { toast } = useToast()
-  const [checkingServer, setCheckingServer] = useState(true)
+  const [_checkingServer, setCheckingServer] = useState(true)
 
   useEffect(() => {
     const checkServer = async () => {
       // Show initial toast
-      const initialToastId = toast({
+      const _initialToastId = toast({
         title: 'Waking up the server zZ',
         description: 'This may take up to a minute on first startup...',
-        duration: Infinity,
+        duration: Number.POSITIVE_INFINITY,
       }).id
 
       try {
@@ -29,7 +29,7 @@ export function ServerStatusChecker() {
             : 'The server responded but may not be fully ready',
           duration: isReady ? 3000 : 5000, // Auto-dismiss success message after 3 seconds
         })
-      } catch (error) {
+      } catch (_error) {
         // Server check failed entirely
         toast({
           title: 'Server connection failed',

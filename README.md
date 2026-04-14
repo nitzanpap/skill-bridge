@@ -26,7 +26,7 @@ See the original jupiter notebooks for the models [in this repository](https://g
 
 ### Frontend
 
-- **Framework**: Next.js 14+ (React framework)
+- **Framework**: Next.js 15+ (React framework)
 - **UI Libraries**:
   - Tailwind CSS for styling
   - Shadcn UI for component library
@@ -34,7 +34,8 @@ See the original jupiter notebooks for the models [in this repository](https://g
 - **Language**: TypeScript
 - **State Management**: React Context API
 - **API Integration**: Fetch API
-- **Build Tools**: Node.js 18+, npm/yarn/pnpm
+- **Runtime & Package Manager**: Bun
+- **Code Quality**: Biome (linting + formatting)
 - **Deployment**: Vercel
 
 ### Backend
@@ -56,10 +57,9 @@ See the original jupiter notebooks for the models [in this repository](https://g
 ### Development Environment
 
 - **Version Control**: Git
-- **Node Version Management**: nvm for managing Node.js versions
-- **Python Version Management**: pyenv (optional) for managing Python versions
+- **Runtime**: Bun (frontend), Python 3.10+ (backend)
 - **Environment Management**: Python virtual environments and .env files
-- **Container Orchestration**: Docker for consistent development and deployment environments
+- **Container Orchestration**: Docker Compose for consistent development and deployment environments
 
 ## Core Components
 
@@ -75,6 +75,9 @@ See the original jupiter notebooks for the models [in this repository](https://g
 
 - Docker (required for deployment)
 - **Supported Platforms**: Any platform that can run Docker
+- **API Keys** (required):
+  - [Pinecone](https://www.pinecone.io/) API key for course vector storage
+  - [Cohere](https://cohere.com/) API key for LLM-based recommendations
 
 > **Note**: The application is designed to run exclusively through Docker to ensure consistent environments across development and production.
 
@@ -124,6 +127,16 @@ Docker allows you to run applications in containers, making setup much easier:
 The API will be available at <http://localhost:8000> with documentation at <http://localhost:8000/docs>
 The frontend application will be available at <http://localhost:3000>
 
+### Security
+
+The application includes several security measures:
+
+- **Input validation**: Request payloads are bounded (50K chars max for text fields)
+- **Rate limiting**: API endpoints are rate-limited (10 requests/minute per IP)
+- **CORS**: Configured with explicit origin allowlists (no wildcard + credentials)
+- **Non-root containers**: Both Docker containers run as non-root users
+- **Error sanitization**: Internal error details are never exposed to clients
+
 ## Deployment
 
 ### Client Deployment
@@ -135,8 +148,8 @@ The frontend application will be available at <http://localhost:3000>
 - **Docker**: The backend is containerized using Docker, allowing for easy deployment on any platform that supports Docker:
 
     ```bash
-    docker build -t skill-bridge-backend .
-    docker run -d -p 8000:8000 skill-bridge-backend
+    docker build -t skill-bridge-backend ./backend
+    docker run -d -p 8000:8000 --env-file backend/.env skill-bridge-backend
     ```
 
 #### Where to deploy

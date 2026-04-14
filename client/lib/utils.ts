@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { Entity } from './api'
+import type { Entity } from './api'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

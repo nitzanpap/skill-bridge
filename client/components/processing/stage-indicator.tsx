@@ -1,8 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { ProcessingStage, StageStatus } from '@/types/processing'
-import { Check, X, Loader2 } from 'lucide-react'
+import { type ProcessingStage, StageStatus } from '@/types/processing'
+import { Check, Loader2, X } from 'lucide-react'
 
 interface StageIndicatorProps {
   stage: ProcessingStage
