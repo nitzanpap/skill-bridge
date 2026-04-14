@@ -2,7 +2,7 @@
 
 ## Credits
 
-- All models themselves, and ML flow (including NLP, RAG, and similarity logic) were written by [Ran Sela](https://github.com/RanSela-033), [Bar Muller](https://github.com/Barm2), and [Bar Redel]().
+- All models themselves, and ML flow (including NLP, RAG, and similarity logic) were written by [Ran Sela](https://github.com/RanSela-033), [Bar Muller](https://github.com/Barm2), and [Bar Redel](https://github.com/BarRedel).
 
 See the original jupiter notebooks for the models [in this repository](https://github.com/RanSela-033/Skill-Bridge_AI_tool).
 
@@ -11,6 +11,10 @@ See the original jupiter notebooks for the models [in this repository](https://g
 ## Description
 
 🎯 Skill Bridge is a recommendation engine that identifies skill gaps between job seekers and job requirements, then suggests targeted upskilling courses to improve job match scores. By bridging the gap between user skills and job requirements, we help candidates become more competitive for their desired positions.
+
+## Flow Diagram
+
+![Flow Diagram](docs/assets/skill-bridge-flow.png)
 
 ## Features
 
