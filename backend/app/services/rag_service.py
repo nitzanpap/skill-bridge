@@ -155,7 +155,7 @@ class RAGService:
             # Call Cohere API for LLM-generated recommendations
             co = cohere.Client(api_key=COHERE_API_KEY)
             response = co.chat(
-                model="command-r-plus",
+                model="command-r-plus-08-2024",
                 message=augmented_prompt,
             )
 
