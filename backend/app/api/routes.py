@@ -105,13 +105,22 @@ async def recommend_courses(request: CourseRecommendationRequest):
             )
 
         # Prepare response data
+        # Use skill_comparison as the source of truth for skills and score,
+        # since RAG service may fail (e.g. Pinecone index not found)
+        job_skills = recommendations["job_skills"] or list(all_job_skills)
+        user_skills = recommendations["user_skills"] or list(
+            set(skill_comparison["matched_skills"])
+        )
+        skill_gap = recommendations["skill_gap"] or skill_comparison["missing_skills"]
+
         response_data = {
             "recommended_courses": recommendations["recommended_courses"],
-            "skill_gap": recommendations["skill_gap"],
-            "job_skills": recommendations["job_skills"],
-            "user_skills": recommendations["user_skills"],
+            "skill_gap": skill_gap,
+            "job_skills": job_skills,
+            "user_skills": user_skills,
             "recommendations_text": recommendations["recommendations_text"],
             "matching_details": skill_comparison["matching_details"],
+            "score": skill_comparison["score"],
         }
 
         # Cache the result for future requests
