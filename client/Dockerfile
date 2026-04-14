@@ -18,7 +18,7 @@ COPY . .
 RUN bun run build
 
 # Run as non-root user
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser && chown -R appuser:appgroup /app
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser && chown -R appuser:appgroup /app
 USER appuser
 
 # Expose port
