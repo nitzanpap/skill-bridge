@@ -533,7 +533,15 @@ export function useResumeAnalysis(): UseResumeAnalysisResult {
       // Error handling is already done in the apiPromise catch block
       // This is just to prevent unhandled promise rejection
     }
-  }, [resumeText, jobDescriptionText, threshold, resetResults, simulateProcessing, toast])
+  }, [
+    resumeText,
+    jobDescriptionText,
+    threshold,
+    resetResults,
+    simulateProcessing,
+    toast,
+    closeProcessingModal,
+  ])
 
   // Demo and Interactive Controls
   const startDemo = useCallback(() => {

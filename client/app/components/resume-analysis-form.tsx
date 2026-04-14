@@ -22,7 +22,6 @@ export function ResumeAnalysisForm({ analysis }: ResumeAnalysisFormProps) {
   const {
     resumeText,
     jobDescriptionText,
-    threshold,
     isProcessing,
     processingStatus,
     setResumeText,

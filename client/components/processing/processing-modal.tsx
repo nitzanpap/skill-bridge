@@ -47,7 +47,6 @@ export function ProcessingModal({
     currentStage,
     timeElapsed,
     estimatedTimeRemaining,
-    modelsInUse,
     totalProgress,
     extractedSkills,
     mode,
