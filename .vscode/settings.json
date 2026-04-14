@@ -17,5 +17,6 @@
     "upskilling",
     "venv"
   ],
-  "python.pythonPath": "${workspaceFolder}/backend/.venv/bin/python"
+  "python.pythonPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "snyk.advanced.autoSelectOrganization": true
 }
