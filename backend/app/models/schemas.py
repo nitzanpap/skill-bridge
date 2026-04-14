@@ -92,3 +92,7 @@ class CourseRecommendationResponse(BaseModel):
         default_factory=list,
         description="Detailed matching information for each job skill",
     )
+    score: float = Field(
+        default=0.0,
+        description="Overall match score as a percentage (0-100)",
+    )

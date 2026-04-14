@@ -211,6 +211,7 @@ export interface SkillBridgeResponse {
   user_skills: string[]
   recommendations_text: string | null
   matching_details: MatchDetail[]
+  score?: number
 }
 
 // Get course recommendations and skill comparison data from a single endpoint
@@ -246,15 +247,35 @@ export const getSkillBridgeData = async (
 
 // Helper function to convert course recommendation response to skill comparison data format
 export const extractSkillComparisonData = (response: SkillBridgeResponse): SkillComparisonData => {
-  // Calculate a score based on matched vs total job skills
-  const totalSkills = response.job_skills.length || 1 // Avoid division by zero
-  const matchedSkills = response.job_skills.filter((skill) => !response.skill_gap.includes(skill))
-  const score = Math.round((matchedSkills.length / totalSkills) * 100)
+  // Use the backend-computed score, falling back to matching_details calculation
+  // for cached responses that may not have the score field
+  const score = response.score != null
+    ? Math.round(response.score)
+    : response.matching_details.length > 0
+      ? Math.round(
+          (response.matching_details.filter((d) => d.is_match).length /
+            response.matching_details.length) *
+            100,
+        )
+      : 0
+
+  // Derive matched/missing skills from matching_details when job_skills is empty
+  const matchedSkills = response.job_skills.length > 0
+    ? response.job_skills.filter((skill) => !response.skill_gap.includes(skill))
+    : response.matching_details
+        .filter((d) => d.is_match)
+        .map((d) => d.job_skill)
+
+  const missingSkills = response.skill_gap.length > 0
+    ? response.skill_gap
+    : response.matching_details
+        .filter((d) => !d.is_match)
+        .map((d) => d.job_skill)
 
   return {
     score,
     matched_skills: matchedSkills,
-    missing_skills: response.skill_gap,
+    missing_skills: missingSkills,
     matching_details: response.matching_details,
   }
 }
