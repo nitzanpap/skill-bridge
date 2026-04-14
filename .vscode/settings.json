@@ -18,6 +18,5 @@
     "venv"
   ],
   "python.pythonPath": "${workspaceFolder}/backend/.venv/bin/python",
-  "snyk.advanced.autoSelectOrganization": true,
-  "snyk.advanced.organization": "6a8af82f-bfb7-401e-8baa-27b0d74276e3"
+  "snyk.advanced.autoSelectOrganization": false
 }

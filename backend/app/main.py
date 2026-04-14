@@ -39,7 +39,7 @@ def _ensure_pinecone_index() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    _ensure_pinecone_index()
+    await asyncio.to_thread(_ensure_pinecone_index)
     yield
 
 

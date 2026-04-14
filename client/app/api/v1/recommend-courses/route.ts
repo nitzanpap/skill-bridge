@@ -2,56 +2,57 @@ import { appConfig } from '@/configs/config'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Helper function to make request with fallback using absolute URLs on server
+const fetchWithTimeout = async (
+  url: string,
+  options: RequestInit,
+  timeoutMs: number,
+): Promise<Response> => {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
 const fetchWithFallback = async (
   endpoint: string,
   options: RequestInit,
   timeoutMs: number = 120000, // 120 seconds - first run needs time for model loading + Cohere API
 ): Promise<Response> => {
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
-
+  // Try primary backend first with absolute URL
   try {
-    // Try primary backend first with absolute URL
-    try {
-      const primaryUrl = `${appConfig.backendUrl}${endpoint}`
-      const response = await fetch(primaryUrl, {
-        ...options,
-        signal: controller.signal,
-      })
+    const primaryUrl = `${appConfig.backendUrl}${endpoint}`
+    const response = await fetchWithTimeout(primaryUrl, options, timeoutMs)
 
-      if (response.ok) {
-        return response
-      }
-
-      // If primary fails with a server error (5xx), try backup
-      // Don't try backup for client errors (4xx) like 404, 400, etc.
-      if (response.status >= 500) {
-        throw new Error(`Primary backend server error: ${response.status}`)
-      }
-
-      // For client errors (4xx), return the response without trying backup
-      console.warn(`⚠️ Primary backend unavailable (${response.status}), not retrying`)
+    if (response.ok) {
       return response
-    } catch (primaryError) {
-      // Only try backup for network errors or server errors
-      console.warn('🔄 Primary backend failed, trying backup...')
-
-      const backupUrl = `${appConfig.backupBackendUrl}${endpoint}`
-      const backupResponse = await fetch(backupUrl, {
-        ...options,
-        signal: controller.signal,
-      })
-
-      if (backupResponse.ok) {
-        console.log('✅ Backup backend connected successfully')
-        return backupResponse
-      }
-
-      // If backup also fails, throw the original error
-      throw primaryError
     }
-  } finally {
-    clearTimeout(timeoutId)
+
+    // If primary fails with a server error (5xx), try backup
+    // Don't try backup for client errors (4xx) like 404, 400, etc.
+    if (response.status >= 500) {
+      throw new Error(`Primary backend server error: ${response.status}`)
+    }
+
+    // For client errors (4xx), return the response without trying backup
+    console.warn(`Primary backend returned ${response.status}, not retrying`)
+    return response
+  } catch (primaryError) {
+    // Only try backup for network errors or server errors
+    console.warn('Primary backend failed, trying backup...')
+
+    const backupUrl = `${appConfig.backupBackendUrl}${endpoint}`
+    // Backup gets its own full timeout window
+    const backupResponse = await fetchWithTimeout(backupUrl, options, timeoutMs)
+
+    if (backupResponse.ok) {
+      return backupResponse
+    }
+
+    // If backup also fails, throw the original error
+    throw primaryError
   }
 }
 
