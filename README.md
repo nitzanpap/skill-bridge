@@ -96,15 +96,30 @@ Docker allows you to run applications in containers, making setup much easier:
     cd skill-bridge
     ```
 
-2. Build and run with Docker Compose
+2. Configure environment variables
+
+    Copy the example env files and add your API keys:
+
+    ```bash
+    cp backend/.env.example backend/.env
+    ```
+
+    Edit `backend/.env` and set your API keys:
+
+    - `PINECONE_API_KEY` (required) - Get one at [pinecone.io](https://www.pinecone.io/)
+    - `COHERE_API_KEY` (required) - Get one at [cohere.com](https://cohere.com/)
+
+3. Build and run with Docker Compose
 
     ```bash
     # Build and start both backend and frontend services
-    docker-compose up -d
+    docker-compose up --build
 
-    # To rebuild containers after making changes
+    # Or run in detached mode
     docker-compose up -d --build
     ```
+
+    On first startup, the backend will automatically create and populate the Pinecone course index (~2 minutes). Subsequent startups skip this step.
 
 The API will be available at <http://localhost:8000> with documentation at <http://localhost:8000/docs>
 The frontend application will be available at <http://localhost:3000>

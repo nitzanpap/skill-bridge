@@ -156,8 +156,11 @@ NODE_ENV=development
 
 ### Environment Variables
 
-- **`NEXT_PUBLIC_API_URL`**: The primary backend API URL. This is the main endpoint the client will
-  try to connect to.
+- **`BACKEND_URL`**: Server-side backend URL, read at runtime. Used in Docker Compose to resolve the
+  backend via its service name (e.g., `http://backend:8000`). Takes priority over `NEXT_PUBLIC_API_URL`.
+- **`BACKUP_BACKEND_URL`**: Server-side backup backend URL, read at runtime.
+- **`NEXT_PUBLIC_API_URL`**: The primary backend API URL (fallback when `BACKEND_URL` is not set).
+  Inlined at build time for client-side code.
 - **`NEXT_PUBLIC_BACKUP_API_URL`**: The backup backend API URL. If the primary backend fails or
   returns a server error (5xx), the client will automatically attempt to use this backup URL.
 - **`NODE_ENV`**: The Node.js environment (development, production, local).
