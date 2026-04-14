@@ -64,8 +64,8 @@ class CacheService:
         # Combine all inputs with separators
         combined_input = f"{normalized_resume}|{normalized_job_desc}|{threshold}"
 
-        # Create MD5 hash for the cache key
-        cache_key = hashlib.md5(combined_input.encode("utf-8")).hexdigest()
+        # Create SHA-256 hash for the cache key
+        cache_key = hashlib.sha256(combined_input.encode("utf-8")).hexdigest()
         return cache_key
 
     @classmethod
