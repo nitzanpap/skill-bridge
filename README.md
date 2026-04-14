@@ -166,6 +166,9 @@ You can deploy the backend on any cloud provider that supports Docker build/comp
 
     # Start ngrok to expose your local backend
     ngrok http 8000
+
+    # Or via your persistent ngrok domain
+    ngrok http --url=<your-ngrok-domain>.ngrok-free.app 8000
     ```
 
 Whatever method you choose, ensure that the backend URL is correctly set in your frontend application configuration (In Vercel's environment variables).
