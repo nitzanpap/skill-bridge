@@ -8,6 +8,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from .api.routes import router
 from .core.config import ALLOWED_ORIGINS, API_V1_STR, PINECONE_API_KEY, PINECONE_INDEX_NAME, PORT, PROJECT_NAME
@@ -44,6 +47,8 @@ async def lifespan(app: FastAPI):
 
 
 # Create FastAPI application
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(
     title=PROJECT_NAME,
     description="API for custom-trained spaCy NER models",
@@ -51,12 +56,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configure CORS
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Configure CORS — disable credentials when using wildcard origins
+_credentials = "*" not in ALLOWED_ORIGINS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_credentials=_credentials,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 

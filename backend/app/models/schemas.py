@@ -47,12 +47,17 @@ class CourseRecommendation(BaseModel):
 class CourseRecommendationRequest(BaseModel):
     """Request schema for generating course recommendations based on skill gap."""
 
-    resume_text: str = Field(..., description="The resume text to analyze")
+    resume_text: str = Field(
+        ..., description="The resume text to analyze", max_length=50_000
+    )
     job_description_text: str = Field(
-        ..., description="The job description text to analyze"
+        ..., description="The job description text to analyze", max_length=50_000
     )
     threshold: float = Field(
-        0.5, description="Similarity threshold for considering skills as a match"
+        0.5,
+        description="Similarity threshold for considering skills as a match",
+        ge=0.0,
+        le=1.0,
     )
 
     model_config = {

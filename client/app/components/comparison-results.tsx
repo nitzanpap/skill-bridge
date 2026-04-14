@@ -1,9 +1,9 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { SkillComparisonData, MatchDetail } from '@/lib/api'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import type { SkillComparisonData } from '@/lib/api'
 
 interface SkillComparisonDisplayProps {
   comparisonResults: SkillComparisonData

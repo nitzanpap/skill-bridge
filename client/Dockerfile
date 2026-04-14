@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM oven/bun:latest
 
 # Set working directory
 WORKDIR /app
@@ -8,17 +8,21 @@ ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 # Install dependencies
-COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 # Copy application code
 COPY . .
 
 # Build the Next.js application
-RUN npm run build
+RUN bun run build
+
+# Run as non-root user
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser && chown -R appuser:appgroup /app
+USER appuser
 
 # Expose port
 EXPOSE 3000
 
 # Command to run the application
-CMD ["npm", "start"] 
+CMD ["bun", "run", "start"]

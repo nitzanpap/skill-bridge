@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { GITHUB_REPOSITORY_URL } from '@/lib/constants'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 import { ThemeToggle } from './theme-toggle'
-import { GITHUB_REPOSITORY_URL } from '@/lib/constants'
 
 export function AppHeader() {
   const [logoImage, setLogoImage] = useState<string | undefined>(undefined)
@@ -22,7 +22,7 @@ export function AppHeader() {
         setLogoImage('/app_logo/logo-light.png')
         setGithubIcon('/github_icons/github_icon_for_light_mode.png')
         return
-      case 'system':
+      case 'system': {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         setLogoImage(prefersDark ? '/app_logo/logo-dark.png' : '/app_logo/logo-light.png')
         setGithubIcon(
@@ -31,6 +31,7 @@ export function AppHeader() {
             : '/github_icons/github_icon_for_light_mode.png',
         )
         return
+      }
       default:
         setLogoImage('/app_logo/logo-light.png')
         setGithubIcon('/github_icons/github_icon_for_light_mode.png')

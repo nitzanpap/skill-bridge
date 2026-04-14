@@ -1,9 +1,9 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { ProcessingStage } from '@/types/processing'
-import { Badge } from '@/components/ui/badge'
-import { FileText, Search, Filter, BarChart3, Database, Brain, Calculator } from 'lucide-react'
+import { BarChart3, Brain, Calculator, Database, FileText, Filter, Search } from 'lucide-react'
 
 interface StageVisualizationProps {
   stage: ProcessingStage

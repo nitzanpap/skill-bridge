@@ -5,7 +5,7 @@ import { NodeEnvs } from '@/types/config'
 
 // to leverage Next.js rewrites and avoid CORS issues
 const isClient = typeof window !== 'undefined'
-const API_BASE_URL = isClient
+const _API_BASE_URL = isClient
   ? '' // Always use relative URLs on client side to leverage Next.js rewrites
   : appConfig.backendUrl || 'http://localhost:8000'
 const API_PREFIX = '/api/v1'
@@ -134,7 +134,7 @@ const fetchWithFallback = async (
  * @param timeout - Timeout in milliseconds (defaults to 60 seconds)
  * @returns Promise with the fetch response
  */
-const fetchWithTimeout = async (
+const _fetchWithTimeout = async (
   url: string,
   options: RequestInit = {},
   timeout: number = DEFAULT_TIMEOUT,
@@ -218,7 +218,7 @@ export interface SkillBridgeResponse {
 export const getSkillBridgeData = async (
   resumeText: string,
   jobDescriptionText: string,
-  threshold: number = 0.5,
+  threshold = 0.5,
 ): Promise<SkillBridgeResponse> => {
   try {
     const response = await fetchWithFallback(`${API_PREFIX}/recommend-courses`, {
@@ -249,28 +249,27 @@ export const getSkillBridgeData = async (
 export const extractSkillComparisonData = (response: SkillBridgeResponse): SkillComparisonData => {
   // Use the backend-computed score, falling back to matching_details calculation
   // for cached responses that may not have the score field
-  const score = response.score != null
-    ? Math.round(response.score)
-    : response.matching_details.length > 0
-      ? Math.round(
-          (response.matching_details.filter((d) => d.is_match).length /
-            response.matching_details.length) *
-            100,
-        )
-      : 0
+  const score =
+    response.score != null
+      ? Math.round(response.score)
+      : response.matching_details.length > 0
+        ? Math.round(
+            (response.matching_details.filter((d) => d.is_match).length /
+              response.matching_details.length) *
+              100,
+          )
+        : 0
 
   // Derive matched/missing skills from matching_details when job_skills is empty
-  const matchedSkills = response.job_skills.length > 0
-    ? response.job_skills.filter((skill) => !response.skill_gap.includes(skill))
-    : response.matching_details
-        .filter((d) => d.is_match)
-        .map((d) => d.job_skill)
+  const matchedSkills =
+    response.job_skills.length > 0
+      ? response.job_skills.filter((skill) => !response.skill_gap.includes(skill))
+      : response.matching_details.filter((d) => d.is_match).map((d) => d.job_skill)
 
-  const missingSkills = response.skill_gap.length > 0
-    ? response.skill_gap
-    : response.matching_details
-        .filter((d) => !d.is_match)
-        .map((d) => d.job_skill)
+  const missingSkills =
+    response.skill_gap.length > 0
+      ? response.skill_gap
+      : response.matching_details.filter((d) => !d.is_match).map((d) => d.job_skill)
 
   return {
     score,

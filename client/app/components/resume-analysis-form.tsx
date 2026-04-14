@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -6,13 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import type { UseResumeAnalysisResult } from '@/hooks/use-resume-analysis'
+import { type SampleTextKey, sampleTexts } from '@/lib/constants'
 import { Loader2 } from 'lucide-react'
-import { DualTextInput } from './text-input'
 // import { ThresholdSlider } from './threshold-slider'
 import { SampleTexts } from './sample-texts'
-import { sampleTexts, SampleTextKey } from '@/lib/constants'
-import { UseResumeAnalysisResult } from '@/hooks/use-resume-analysis'
+import { DualTextInput } from './text-input'
 
 interface ResumeAnalysisFormProps {
   analysis: UseResumeAnalysisResult
@@ -22,7 +22,6 @@ export function ResumeAnalysisForm({ analysis }: ResumeAnalysisFormProps) {
   const {
     resumeText,
     jobDescriptionText,
-    threshold,
     isProcessing,
     processingStatus,
     setResumeText,

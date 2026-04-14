@@ -1,6 +1,6 @@
+import type { UseResumeAnalysisResult } from '@/hooks/use-resume-analysis'
 import { SkillComparisonDisplay } from './comparison-results'
 import { CourseRecommendationsDisplay } from './course-recommendations'
-import { UseResumeAnalysisResult } from '@/hooks/use-resume-analysis'
 
 interface AnalysisResultsProps {
   analysis: UseResumeAnalysisResult

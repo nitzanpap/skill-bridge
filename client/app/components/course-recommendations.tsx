@@ -1,10 +1,10 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ExternalLink, Star, ArrowUp, TrendingUp } from 'lucide-react'
-import { SkillBridgeResponse } from '@/lib/api'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { SkillBridgeResponse } from '@/lib/api'
+import { ArrowUp, ExternalLink, Star } from 'lucide-react'
 
 interface CourseRecommendationsDisplayProps {
   recommendations: SkillBridgeResponse
@@ -58,7 +58,7 @@ export function CourseRecommendationsDisplay({
               {recommended_courses.map((course, index) => {
                 const isHighestScore =
                   course.potential_score === maxPotentialScore && course.score_improvement > 0
-                const potentialScoreValue = course.potential_score?.toFixed(1) || '0.0'
+                const _potentialScoreValue = course.potential_score?.toFixed(1) || '0.0'
                 const scoreImprovement = course.score_improvement?.toFixed(1) || '0.0'
 
                 return (

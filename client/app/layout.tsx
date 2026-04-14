@@ -1,13 +1,13 @@
-import type React from 'react'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import type React from 'react'
 import './globals.css'
+import { ServerStatusChecker } from '@/components/server-status-checker'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
-import { ServerStatusChecker } from '@/components/server-status-checker'
-import { Analytics } from '@vercel/analytics/react'
 import { appConfig } from '@/configs/config'
 import { NodeEnvs } from '@/types/config'
+import { Analytics } from '@vercel/analytics/react'
 
 const inter = Inter({ subsets: ['latin'] })
 

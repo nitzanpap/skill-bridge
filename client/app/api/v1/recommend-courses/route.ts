@@ -1,5 +1,5 @@
 import { appConfig } from '@/configs/config'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // Helper function to make request with fallback using absolute URLs on server
 const fetchWithTimeout = async (
@@ -19,7 +19,7 @@ const fetchWithTimeout = async (
 const fetchWithFallback = async (
   endpoint: string,
   options: RequestInit,
-  timeoutMs: number = 120000, // 120 seconds - first run needs time for model loading + Cohere API
+  timeoutMs = 120000, // 120 seconds - first run needs time for model loading + Cohere API
 ): Promise<Response> => {
   // Try primary backend first with absolute URL
   try {
@@ -79,12 +79,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Proxy error:', error)
 
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        return NextResponse.json({ error: 'Request timed out' }, { status: 408 })
-      }
-
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error instanceof Error && error.name === 'AbortError') {
+      return NextResponse.json({ error: 'Request timed out' }, { status: 408 })
     }
 
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

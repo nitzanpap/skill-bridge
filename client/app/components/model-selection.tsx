@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { fetchModels } from '@/lib/api'
 import { Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface ModelSelectionProps {
   selectedModels: string[]

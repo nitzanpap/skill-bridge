@@ -17,7 +17,8 @@ Implemented serverless architecture using AWS Lambda and API Gateway
 Reduced page load time by 40% through code optimization
 `,
 
-  'software-engineer-job': `We are looking for a Software Engineer with 5+ years of experience in React, Node.js, and TypeScript. The ideal candidate should have strong problem-solving skills and experience with AWS, Docker, and CI/CD pipelines. Knowledge of Python and machine learning frameworks like TensorFlow or PyTorch is a plus. Must be located in San Francisco or willing to relocate.`,
+  'software-engineer-job':
+    'We are looking for a Software Engineer with 5+ years of experience in React, Node.js, and TypeScript. The ideal candidate should have strong problem-solving skills and experience with AWS, Docker, and CI/CD pipelines. Knowledge of Python and machine learning frameworks like TensorFlow or PyTorch is a plus. Must be located in San Francisco or willing to relocate.',
 
   'data-scientist-resume': `PROFESSIONAL SUMMARY
 Data scientist with 4 years of experience analyzing large datasets and building predictive models. Proficient in Python, R, and SQL with strong background in statistical analysis and machine learning.
@@ -31,7 +32,8 @@ Big Data: Hadoop, Spark
 Machine Learning: Regression, Classification, Clustering
 `,
 
-  'data-scientist-job': `Seeking a Data Scientist with expertise in Python, R, and SQL. Must have experience with data visualization tools like Tableau or Power BI, and machine learning libraries such as scikit-learn, TensorFlow, and PyTorch. Knowledge of big data technologies like Hadoop and Spark is required. The position is at DataTech in New York City.`,
+  'data-scientist-job':
+    'Seeking a Data Scientist with expertise in Python, R, and SQL. Must have experience with data visualization tools like Tableau or Power BI, and machine learning libraries such as scikit-learn, TensorFlow, and PyTorch. Knowledge of big data technologies like Hadoop and Spark is required. The position is at DataTech in New York City.',
 } as const
 
 export type SampleTextKey = keyof typeof sampleTexts

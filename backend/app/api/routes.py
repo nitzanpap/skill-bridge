@@ -3,9 +3,10 @@ API routes for the Skill Bridge application.
 """
 
 import logging
-from fastapi import APIRouter, HTTPException
 
-logger = logging.getLogger(__name__)
+from fastapi import APIRouter, HTTPException, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from ..models.schemas import (
     CourseRecommendationRequest,
@@ -16,12 +17,16 @@ from ..services.nlp_service import NLPService
 from ..services.rag_service import RAGService
 from ..services.similarity_service import SimilarityService
 
+logger = logging.getLogger(__name__)
+
 # Create router instance
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/recommend-courses", response_model=CourseRecommendationResponse)
-async def recommend_courses(request: CourseRecommendationRequest):
+@limiter.limit("10/minute")
+async def recommend_courses(request: Request, body: CourseRecommendationRequest):
     """
     Recommend courses based on skill gap between resume and job description.
     Now with disk-based caching for identical requests.
@@ -39,7 +44,7 @@ async def recommend_courses(request: CourseRecommendationRequest):
     try:
         # Check cache first for existing results
         cached_result = CacheService.get_course_recommendation(
-            request.resume_text, request.job_description_text, request.threshold
+            body.resume_text, body.job_description_text, body.threshold
         )
 
         if cached_result:
@@ -51,9 +56,9 @@ async def recommend_courses(request: CourseRecommendationRequest):
 
         # First get the skill comparison using the NLP service
         skill_comparison = NLPService.compare_skills_semantic(
-            request.resume_text,
-            request.job_description_text,
-            threshold=request.threshold,
+            body.resume_text,
+            body.job_description_text,
+            threshold=body.threshold,
         )
 
         # Extract all job skills from the skill comparison (both matched and missing)
@@ -65,8 +70,8 @@ async def recommend_courses(request: CourseRecommendationRequest):
         # Generate course recommendations using RAG service
         # Pass ALL job skills as ground_truth_skills, not just missing skills
         recommendations = RAGService.generate_course_recommendations(
-            request.job_description_text,
-            request.resume_text,
+            body.job_description_text,
+            body.resume_text,
             ground_truth_skills=all_job_skills,
         )
 
@@ -95,7 +100,7 @@ async def recommend_courses(request: CourseRecommendationRequest):
 
             # Calculate new match score with enhanced skills
             enhanced_score_result = SimilarityService.semantic_matching_score(
-                job_skills_set, enhanced_skills, threshold=request.threshold
+                job_skills_set, enhanced_skills, threshold=body.threshold
             )
 
             # Add score to the course object
@@ -127,9 +132,9 @@ async def recommend_courses(request: CourseRecommendationRequest):
         if recommendations["recommended_courses"]:
             logger.info("Request: Caching result for future requests...")
             cache_success = CacheService.set_course_recommendation(
-                request.resume_text,
-                request.job_description_text,
-                request.threshold,
+                body.resume_text,
+                body.job_description_text,
+                body.threshold,
                 response_data,
             )
             logger.info(f"Request: Cache storage success: {cache_success}")
@@ -139,6 +144,8 @@ async def recommend_courses(request: CourseRecommendationRequest):
         # Convert the recommendations to the response model
         return CourseRecommendationResponse(**response_data)
     except Exception as e:
+        logger.exception("Error generating course recommendations")
         raise HTTPException(
-            status_code=500, detail=f"Error generating course recommendations: {str(e)}"
+            status_code=500,
+            detail="An error occurred while generating recommendations. Please try again later.",
         )

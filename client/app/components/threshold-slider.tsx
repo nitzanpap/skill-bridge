@@ -16,7 +16,7 @@ export function ThresholdSlider({ threshold, onThresholdChange }: ThresholdSlide
         max='0.9'
         step='0.05'
         value={threshold}
-        onChange={(e) => onThresholdChange(parseFloat(e.target.value))}
+        onChange={(e) => onThresholdChange(Number.parseFloat(e.target.value))}
         className='w-full max-w-md'
       />
       <p className='text-xs text-muted-foreground'>

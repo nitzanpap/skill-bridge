@@ -1,26 +1,24 @@
 'use client'
 
-import { X, Play, Pause, Square, ChevronLeft, ChevronRight } from 'lucide-react'
-import {
-  ProcessingState,
-  ProcessingStage,
-  StageStatus,
-  PROCESSING_STAGES,
-  ProcessingMode,
-  PlaybackState,
-} from '@/types/processing'
+import { ProgressPipeline } from '@/components/processing/progress-pipeline'
+import { StageIndicator } from '@/components/processing/stage-indicator'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { StageIndicator } from '@/components/processing/stage-indicator'
-import { ModelCard } from '@/components/processing/model-card'
-import { ProgressPipeline } from '@/components/processing/progress-pipeline'
-import { StageVisualization } from '@/components/processing/stage-visualization'
+import {
+  PROCESSING_STAGES,
+  PlaybackState,
+  ProcessingMode,
+  ProcessingStage,
+  type ProcessingState,
+  StageStatus,
+} from '@/types/processing'
+import { ChevronLeft, ChevronRight, Pause, Play, Square } from 'lucide-react'
 
 interface ProcessingModalProps {
   isOpen: boolean
@@ -49,7 +47,6 @@ export function ProcessingModal({
     currentStage,
     timeElapsed,
     estimatedTimeRemaining,
-    modelsInUse,
     totalProgress,
     extractedSkills,
     mode,
