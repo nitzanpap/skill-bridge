@@ -6,7 +6,7 @@ import os
 from typing import Dict, List, Optional
 
 import pandas as pd
-from pinecone import Pinecone
+from pinecone import Pinecone, ServerlessSpec
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
@@ -39,6 +39,10 @@ def load_courses_data(file_path: Optional[str] = None) -> pd.DataFrame:
     )
 
     # Preprocess the data
+    df.columns = df.columns.str.strip()
+    # Normalize column name: the CSV may use "URL" (uppercase)
+    if "URL" in df.columns and "url" not in df.columns:
+        df = df.rename(columns={"URL": "url"})
     df = df.fillna("")  # Fill NaN values
 
     # Create a combined course description field
@@ -118,14 +122,15 @@ def index_courses(records: List[Dict], batch_size: int = 100) -> None:
     pc = Pinecone(api_key=PINECONE_API_KEY)
 
     # Check if index exists, if not create it
-    index_list = pc.list_indexes()
+    existing_names = [idx.name for idx in pc.list_indexes()]
 
-    if PINECONE_INDEX_NAME not in index_list:
+    if PINECONE_INDEX_NAME not in existing_names:
         # Create the index
         pc.create_index(
             name=PINECONE_INDEX_NAME,
             dimension=len(records[0]["values"]),
             metric="cosine",
+            spec=ServerlessSpec(cloud="aws", region="us-east-1"),
         )
 
     # Get the index

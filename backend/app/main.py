@@ -2,17 +2,52 @@
 Main entrypoint for the API.
 """
 
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.routes import router
-from .core.config import ALLOWED_ORIGINS, API_V1_STR, PORT, PROJECT_NAME
+from .core.config import ALLOWED_ORIGINS, API_V1_STR, PINECONE_API_KEY, PINECONE_INDEX_NAME, PORT, PROJECT_NAME
+
+logger = logging.getLogger(__name__)
+
+
+def _ensure_pinecone_index() -> None:
+    """Check if the Pinecone course index exists, and create + populate it if not."""
+    if not PINECONE_API_KEY:
+        logger.warning("PINECONE_API_KEY not set — skipping course index check")
+        return
+
+    from pinecone import Pinecone
+
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+    existing = [idx.name for idx in pc.list_indexes()]
+
+    if PINECONE_INDEX_NAME in existing:
+        logger.info("Pinecone index '%s' already exists", PINECONE_INDEX_NAME)
+        return
+
+    logger.info("Pinecone index '%s' not found — creating and populating...", PINECONE_INDEX_NAME)
+    from .utils.embedding_utils import prepare_and_index_courses
+
+    prepare_and_index_courses()
+    logger.info("Pinecone index '%s' is ready", PINECONE_INDEX_NAME)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    _ensure_pinecone_index()
+    yield
+
 
 # Create FastAPI application
 app = FastAPI(
     title=PROJECT_NAME,
     description="API for custom-trained spaCy NER models",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # Configure CORS
